@@ -1,28 +1,33 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { motion } from 'framer-motion';
-import { Eye, EyeOff, ArrowRight, Zap } from 'lucide-react';
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { motion } from "framer-motion";
+import { Eye, EyeOff, ArrowRight, Zap } from "lucide-react";
 
 export default function Login() {
-  const [email, setEmail] = useState('admin@eventiq.com');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState("admin@eventiq.com");
+  const [password, setPassword] = useState("admin123");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+
   const { login, isLoading } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
+
     try {
       await login(email, password);
-      navigate('/dashboard');
+      router.push("/dashboard");
     } catch {
-      setError('Invalid credentials');
+      setError("Invalid credentials");
     }
   };
 
@@ -34,6 +39,7 @@ export default function Login() {
           <div className="absolute top-20 left-20 w-72 h-72 rounded-full bg-accent blur-[100px]" />
           <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-info blur-[120px]" />
         </div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -44,19 +50,28 @@ export default function Login() {
             <div className="w-10 h-10 rounded-xl gradient-accent flex items-center justify-center">
               <Zap className="w-5 h-5 text-accent-foreground" />
             </div>
-            <span className="text-2xl font-bold text-primary-foreground">EventIQ</span>
+            <span className="text-2xl font-bold text-primary-foreground">
+              EventIQ
+            </span>
           </div>
+
           <h1 className="text-4xl font-bold text-primary-foreground mb-4 leading-tight">
             Intelligent Event Analytics Platform
           </h1>
+
           <p className="text-sidebar-muted text-lg leading-relaxed">
-            Measure event performance and sponsor ROI with powerful data-driven insights. Built for organizers and sponsors who demand excellence.
+            Measure event performance and sponsor ROI with powerful
+            data-driven insights. Built for organizers and sponsors who demand
+            excellence.
           </p>
+
           <div className="mt-10 flex gap-6">
-            {['500+ Events', '98% Accuracy', '10x ROI'].map((stat) => (
+            {["500+ Events", "98% Accuracy", "10x ROI"].map((stat) => (
               <div key={stat} className="text-sm text-sidebar-muted">
-                <span className="block text-lg font-semibold text-primary-foreground">{stat.split(' ')[0]}</span>
-                {stat.split(' ').slice(1).join(' ')}
+                <span className="block text-lg font-semibold text-primary-foreground">
+                  {stat.split(" ")[0]}
+                </span>
+                {stat.split(" ").slice(1).join(" ")}
               </div>
             ))}
           </div>
@@ -79,7 +94,9 @@ export default function Login() {
           </div>
 
           <h2 className="text-2xl font-bold mb-2">Welcome back</h2>
-          <p className="text-muted-foreground mb-8">Sign in to your account to continue</p>
+          <p className="text-muted-foreground mb-8">
+            Sign in to your account to continue
+          </p>
 
           {error && (
             <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
@@ -104,26 +121,36 @@ export default function Login() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link to="/forgot-password" className="text-sm text-accent hover:underline">
+
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-accent hover:underline"
+                >
                   Forgot password?
                 </Link>
               </div>
+
               <div className="relative">
                 <Input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
                   className="h-11 pr-10"
                 />
+
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -136,20 +163,28 @@ export default function Login() {
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-accent-foreground/30 border-t-accent-foreground rounded-full animate-spin" />
               ) : (
-                <>Sign in <ArrowRight className="w-4 h-4 ml-2" /></>
+                <>
+                  Sign in
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </>
               )}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-accent font-medium hover:underline">
+            Don't have an account?{" "}
+            <Link
+              href="/register"
+              className="text-accent font-medium hover:underline"
+            >
               Create one
             </Link>
           </p>
 
           <div className="mt-8 p-4 rounded-lg bg-muted/50 border border-border">
-            <p className="text-xs text-muted-foreground font-medium mb-2">Demo Credentials</p>
+            <p className="text-xs text-muted-foreground font-medium mb-2">
+              Demo Credentials
+            </p>
             <div className="text-xs text-muted-foreground space-y-1">
               <p>Admin: admin@eventiq.com / admin123</p>
               <p>Sponsor: sponsor@eventiq.com / sponsor123</p>
