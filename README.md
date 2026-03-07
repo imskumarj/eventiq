@@ -395,6 +395,7 @@ http://localhost:3000
 
 # 🔮 Future Enhancements
 
+* Dual deployment procedure for frontend and backend separately 
 * Multi-tenant SaaS model
 * Stripe integration for sponsor billing
 * Redis caching layer
