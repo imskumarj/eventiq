@@ -12,7 +12,7 @@ Built with a modern full-stack architecture and deployed on AWS cloud infrastruc
 
 # 📌 Table of Contents
 
-* Overview
+* Overview 
 * Problem Statement
 * Key Features
 * System Architecture
