@@ -12,7 +12,7 @@ Built with a modern full-stack architecture and deployed on AWS cloud infrastruc
 
 # 📌 Table of Contents
 
-* Overview
+* Overview 
 * Problem Statement
 * Key Features
 * System Architecture
@@ -395,6 +395,7 @@ http://localhost:3000
 
 # 🔮 Future Enhancements
 
+* Dual deployment procedure for frontend and backend separately 
 * Multi-tenant SaaS model
 * Stripe integration for sponsor billing
 * Redis caching layer
