@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
+} from "./ui/dropdown-menu";
 
 export default function TopNavbar() {
   const { user, logout } = useAuth();

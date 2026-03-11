@@ -3,8 +3,8 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import AppSidebar from "../components/AppSidebar";
-import TopNavbar from "../components/TopNavbar";
+import AppSidebar from "./AppSidebar";
+import TopNavbar from "./TopNavbar";
 
 export default function DashboardLayout({
   children,
