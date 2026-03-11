@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 import { Bell, Search, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "../components/ui/dropdown-menu";
 
 export default function TopNavbar() {
   const { user, logout } = useAuth();

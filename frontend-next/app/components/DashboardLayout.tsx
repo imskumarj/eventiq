@@ -1,10 +1,10 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import AppSidebar from "@/components/AppSidebar";
-import TopNavbar from "@/components/TopNavbar";
+import AppSidebar from "../components/AppSidebar";
+import TopNavbar from "../components/TopNavbar";
 
 export default function DashboardLayout({
   children,

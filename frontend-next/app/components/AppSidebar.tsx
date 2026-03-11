@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -16,7 +16,7 @@ import {
   LogOut,
   TrendingUp,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 

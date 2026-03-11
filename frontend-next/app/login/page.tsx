@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useAuth } from "../contexts/AuthContext";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowRight, Zap } from "lucide-react";
 
@@ -59,7 +59,7 @@ export default function Login() {
             Intelligent Event Analytics Platform
           </h1>
 
-          <p className="text-sidebar-muted text-lg leading-relaxed">
+          <p className="text-white/50 text-lg leading-relaxed">
             Measure event performance and sponsor ROI with powerful
             data-driven insights. Built for organizers and sponsors who demand
             excellence.
@@ -71,7 +71,9 @@ export default function Login() {
                 <span className="block text-lg font-semibold text-primary-foreground">
                   {stat.split(" ")[0]}
                 </span>
-                {stat.split(" ").slice(1).join(" ")}
+                <span className="text-white/50">
+                  {stat.split(" ").slice(1).join(" ")}
+                </span>
               </div>
             ))}
           </div>
