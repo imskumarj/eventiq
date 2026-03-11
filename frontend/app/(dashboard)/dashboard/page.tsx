@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import KpiCard from '@/components/KpiCard';
+import KpiCard from '../../components/KpiCard';
 import { Calendar, Users, DollarSign, TrendingUp, Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../../components/ui/button';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend
