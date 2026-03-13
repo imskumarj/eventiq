@@ -63,3 +63,74 @@ npm run dev
 ```
 
 Production mode
+```
+npm start
+```
+
+---
+
+# Database Setup
+
+Run Prisma migrations
+```
+npx prisma migrate dev --name init
+```
+
+Open Prisma Studio
+```
+npx prisma studio
+```
+
+---
+
+# API Base URL
+
+http://localhost:5000/api
+
+
+---
+
+# Example Endpoints
+
+## Authentication
+
+POST /api/auth/login  
+POST /api/auth/register
+
+## Events
+
+GET /api/events  
+POST /api/events
+
+## Sponsors
+
+GET /api/sponsors  
+POST /api/sponsors
+
+## Analytics
+
+GET /api/analytics
+
+---
+
+# Security Features
+
+- Helmet security headers
+- Rate limiting
+- JWT authentication
+- Role-based access control
+- Password hashing (bcrypt)
+
+---
+
+# Future Improvements
+
+- Redis caching
+- AWS S3 CSV uploads
+- Background job processing
+- Real-time dashboards
+
+---
+
+# Author
+Sudhansu Kumar
