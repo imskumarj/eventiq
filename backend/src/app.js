@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 import authRoutes from "./routes/auth.js";
 import eventsRoutes from "./routes/events.js";
@@ -8,6 +9,13 @@ import sponsorsRoutes from "./routes/sponsors.js";
 import analyticsRoutes from "./routes/analytics.js";
 
 const app = express();
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100
+});
+
+app.use(limiter);
 
 app.use(cors());
 app.use(helmet());

@@ -10,8 +10,8 @@ generator client {
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
-  name      String
   password  String
+  name      String
   role      Role
   createdAt DateTime @default(now())
 
@@ -38,16 +38,16 @@ model Sponsor {
 }
 
 model Sponsorship {
-  id         String @id @default(uuid())
-  eventId    String
-  sponsorId  String
-  amount     Int
-  leads      Int
+  id          String @id @default(uuid())
+  eventId     String
+  sponsorId   String
+  amount      Int
   boothVisits Int
-  roi        Float
+  leads       Int
+  roi         Float
 
-  event      Event   @relation(fields: [eventId], references: [id])
-  sponsor    Sponsor @relation(fields: [sponsorId], references: [id])
+  event       Event   @relation(fields: [eventId], references: [id])
+  sponsor     Sponsor @relation(fields: [sponsorId], references: [id])
 }
 
 enum Role {
