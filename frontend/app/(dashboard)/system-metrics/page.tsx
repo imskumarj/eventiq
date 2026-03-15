@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import KpiCard from "../../components/KpiCard";
+import KpiCard from "../../../components/KpiCard";
 
 import {
   Activity,
