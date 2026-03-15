@@ -11,29 +11,36 @@ import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowRight, Zap } from "lucide-react";
 
 export default function Login() {
-  const [email, setEmail] = useState("admin@eventiq.com");
-  const [password, setPassword] = useState("admin123");
+  const router = useRouter();
+  const { login, isLoading } = useAuth();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const { login, isLoading } = useAuth();
-  const router = useRouter();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setError("");
 
+    if (!email || !password) {
+      setError("Please enter email and password");
+      return;
+    }
+
     try {
-      await login(email, password);
+      await login(email.trim(), password);
+
       router.push("/dashboard");
-    } catch {
-      setError("Invalid credentials");
+    } catch (err: any) {
+      setError(err.message || "Invalid email or password");
     }
   };
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel */}
+      {/* LEFT PANEL */}
       <div className="hidden lg:flex lg:w-1/2 gradient-navy items-center justify-center p-12 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-20 w-72 h-72 rounded-full bg-accent blur-[100px]" />
@@ -50,6 +57,7 @@ export default function Login() {
             <div className="w-10 h-10 rounded-xl gradient-accent flex items-center justify-center">
               <Zap className="w-5 h-5 text-accent-foreground" />
             </div>
+
             <span className="text-2xl font-bold text-primary-foreground">
               EventIQ
             </span>
@@ -61,8 +69,7 @@ export default function Login() {
 
           <p className="text-white/50 text-lg leading-relaxed">
             Measure event performance and sponsor ROI with powerful
-            data-driven insights. Built for organizers and sponsors who demand
-            excellence.
+            data-driven insights for organizers and sponsors.
           </p>
 
           <div className="mt-10 flex gap-6">
@@ -80,7 +87,7 @@ export default function Login() {
         </motion.div>
       </div>
 
-      {/* Right panel */}
+      {/* RIGHT PANEL */}
       <div className="flex-1 flex items-center justify-center p-8 bg-background">
         <motion.div
           initial={{ opacity: 0, x: 20 }}
@@ -88,14 +95,17 @@ export default function Login() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="w-full max-w-md"
         >
+          {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-2 mb-8">
             <div className="w-8 h-8 rounded-lg gradient-accent flex items-center justify-center">
               <Zap className="w-4 h-4 text-accent-foreground" />
             </div>
+
             <span className="text-xl font-bold">EventIQ</span>
           </div>
 
           <h2 className="text-2xl font-bold mb-2">Welcome back</h2>
+
           <p className="text-muted-foreground mb-8">
             Sign in to your account to continue
           </p>
@@ -107,38 +117,32 @@ export default function Login() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* EMAIL */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
+
               <Input
                 id="email"
                 type="email"
+                placeholder="you@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
                 required
                 className="h-11"
               />
             </div>
 
+            {/* PASSWORD */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-accent hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
+              <Label htmlFor="password">Password</Label>
 
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
                   required
                   className="h-11 pr-10"
                 />
@@ -157,6 +161,7 @@ export default function Login() {
               </div>
             </div>
 
+            {/* LOGIN BUTTON */}
             <Button
               type="submit"
               disabled={isLoading}
@@ -173,6 +178,7 @@ export default function Login() {
             </Button>
           </form>
 
+          {/* REGISTER LINK */}
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Don't have an account?{" "}
             <Link
@@ -182,16 +188,6 @@ export default function Login() {
               Create one
             </Link>
           </p>
-
-          <div className="mt-8 p-4 rounded-lg bg-muted/50 border border-border">
-            <p className="text-xs text-muted-foreground font-medium mb-2">
-              Demo Credentials
-            </p>
-            <div className="text-xs text-muted-foreground space-y-1">
-              <p>Admin: admin@eventiq.com / admin123</p>
-              <p>Sponsor: sponsor@eventiq.com / sponsor123</p>
-            </div>
-          </div>
         </motion.div>
       </div>
     </div>

@@ -43,14 +43,25 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("admin");
+  const [role, setRole] = useState<UserRole>("organizer");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
 
-    await register(email, password, name, role);
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
 
-    router.push("/dashboard");
+    try {
+      await register(email, password, name, role);
+
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "Registration failed");
+    }
   };
 
   return (
@@ -61,6 +72,7 @@ export default function Register() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
+        {/* Logo */}
         <div className="flex items-center gap-2 mb-8">
           <div className="w-8 h-8 rounded-lg gradient-accent flex items-center justify-center">
             <Zap className="w-4 h-4 text-accent-foreground" />
@@ -73,7 +85,14 @@ export default function Register() {
           Get started with EventIQ analytics
         </p>
 
+        {error && (
+          <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
             <Input
@@ -86,6 +105,7 @@ export default function Register() {
             />
           </div>
 
+          {/* Email */}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -99,6 +119,7 @@ export default function Register() {
             />
           </div>
 
+          {/* Password */}
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
             <Input
@@ -106,12 +127,14 @@ export default function Register() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Min 8 characters"
+              placeholder="Minimum 8 characters"
               required
+              minLength={8}
               className="h-11"
             />
           </div>
 
+          {/* Role selector */}
           <div className="space-y-2">
             <Label>Select your role</Label>
 
@@ -135,6 +158,7 @@ export default function Register() {
             </div>
           </div>
 
+          {/* Submit */}
           <Button
             type="submit"
             disabled={isLoading}
@@ -151,6 +175,7 @@ export default function Register() {
           </Button>
         </form>
 
+        {/* Login link */}
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
           <Link
