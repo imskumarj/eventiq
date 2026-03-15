@@ -1,15 +1,22 @@
-import axios from "axios";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-});
+export async function apiRequest(
+  endpoint: string,
+  options: RequestInit = {}
+) {
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    ...options,
+  });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("eventiq_token");
+  const data = await res.json();
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (!res.ok) {
+    throw new Error(data.message || "API Error");
   }
 
-  return config;
-});
+  return data;
+}
