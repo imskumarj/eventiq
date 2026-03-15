@@ -1,8 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { apiRequest } from "../services/api";
- import { registerUser } from "../services/register";
+import { registerUser } from "../services/register";
+import { loginUser } from "../services/login";
 
 export type UserRole = "admin" | "sponsor" | "organizer";
 
@@ -25,6 +25,7 @@ interface AuthContextType {
     name: string,
     role: UserRole
   ) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,7 +34,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Restore session
   useEffect(() => {
     const storedUser = localStorage.getItem("eventiq_user");
     const token = localStorage.getItem("eventiq_token");
@@ -45,7 +45,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  // REGISTER
   const register = async (
     email: string,
     password: string,
@@ -55,12 +54,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
 
     try {
-      const res = await registerUser({
-        email,
-        password,
-        name,
-        role,
-      });
+      const res = await registerUser({ email, password, name, role });
+
+      const { user, token } = res.data;
+
+      setUser(user);
+
+      localStorage.setItem("eventiq_user", JSON.stringify(user));
+      localStorage.setItem("eventiq_token", token);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
+
+    try {
+      const res = await loginUser({ email, password });
 
       const { user, token } = res.data;
 
@@ -80,6 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: !!user,
         isLoading,
         register,
+        login,
       }}
     >
       {children}
