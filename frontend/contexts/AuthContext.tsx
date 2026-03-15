@@ -19,13 +19,17 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+
   register: (
     email: string,
     password: string,
     name: string,
     role: UserRole
   ) => Promise<void>;
+
   login: (email: string, password: string) => Promise<void>;
+
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -84,6 +88,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const logout = () => {
+    setUser(null);
+
+    localStorage.removeItem("eventiq_user");
+    localStorage.removeItem("eventiq_token");
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -92,6 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         register,
         login,
+        logout,
       }}
     >
       {children}
