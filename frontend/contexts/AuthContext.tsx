@@ -1,8 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { registerUser } from "../services/register";
-import { loginUser } from "../services/login";
+import { registerUser, loginUser } from "../services/auth";
 
 export type UserRole = "admin" | "sponsor" | "organizer";
 
