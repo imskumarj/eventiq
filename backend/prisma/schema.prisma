@@ -61,3 +61,11 @@ model Sponsorship {
   event   Event   @relation(fields: [eventId], references: [id])
   sponsor Sponsor @relation(fields: [sponsorId], references: [id])
 }
+
+model ImportLog {
+  id        String   @id @default(uuid())
+  filename  String
+  rows      Int
+  status    String
+  createdAt DateTime @default(now())
+}
