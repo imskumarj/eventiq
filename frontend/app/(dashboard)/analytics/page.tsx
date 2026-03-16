@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-import { getAnalyticsDashboard } from "../../../services/analytics";
+import { getAnalyticsDashboard } from "@/services/analytics";
 
 import {
   BarChart,
@@ -25,9 +25,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../../components/ui/table";
+} from "@/components/ui/table";
 
-import { Badge } from "../../../components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 
 /* ---------------- TYPES ---------------- */
 
