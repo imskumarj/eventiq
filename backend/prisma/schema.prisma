@@ -7,6 +7,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum Role {
+  admin
+  organizer
+  sponsor
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -15,43 +21,43 @@ model User {
   role      Role
   createdAt DateTime @default(now())
 
-  events    Event[]
+  events Event[] @relation("OrganizerEvents")
 }
 
 model Event {
-  id          String   @id @default(uuid())
-  name        String
-  location    String
-  date        DateTime
-  organizerId String
+  id         String   @id @default(uuid())
+  name       String
+  date       DateTime
+  location   String
+  revenue    Float
+  attendees  Int
+  engagement Float
+  createdAt  DateTime @default(now())
 
-  organizer   User     @relation(fields: [organizerId], references: [id])
-  sponsors    Sponsorship[]
+  organizerId String?
+  organizer   User?   @relation("OrganizerEvents", fields: [organizerId], references: [id])
+
+  sponsors Sponsorship[]
 }
 
 model Sponsor {
-  id     String   @id @default(uuid())
-  name   String
-  tier   String
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
 
-  events Sponsorship[]
+  sponsorships Sponsorship[]
 }
 
 model Sponsorship {
-  id          String @id @default(uuid())
-  eventId     String
-  sponsorId   String
-  amount      Int
+  id String @id @default(uuid())
+
+  eventId   String
+  sponsorId String
+
+  investment  Float
   boothVisits Int
   leads       Int
-  roi         Float
 
-  event       Event   @relation(fields: [eventId], references: [id])
-  sponsor     Sponsor @relation(fields: [sponsorId], references: [id])
-}
-
-enum Role {
-  admin
-  organizer
-  sponsor
+  event   Event   @relation(fields: [eventId], references: [id])
+  sponsor Sponsor @relation(fields: [sponsorId], references: [id])
 }
