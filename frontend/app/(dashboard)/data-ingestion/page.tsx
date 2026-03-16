@@ -3,15 +3,49 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Upload, FileUp, Key, CheckCircle, AlertCircle } from "lucide-react";
-import { useState, useRef } from "react";
+
+import { useState, useRef, useEffect } from "react";
+
+import {
+  uploadCsv,
+  getImports,
+} from "@/services/dataingestion";
 
 export default function DataIngestion() {
   const [dragActive, setDragActive] = useState(false);
+  const [imports, setImports] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = (file: File) => {
-    console.log("Selected file:", file);
-    // Later: send to API
+  /* ---------------- Fetch Imports ---------------- */
+
+  const fetchImports = async () => {
+    try {
+      const res = await getImports();
+      setImports(res.data);
+    } catch (err) {
+      console.error("Failed to load imports");
+    }
+  };
+
+  useEffect(() => {
+    fetchImports();
+  }, []);
+
+  /* ---------------- Upload CSV ---------------- */
+
+  const handleFileSelect = async (file: File) => {
+    setLoading(true);
+
+    try {
+      await uploadCsv(file);
+      await fetchImports();
+    } catch (err) {
+      console.error("Upload failed");
+    }
+
+    setLoading(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -19,6 +53,7 @@ export default function DataIngestion() {
     setDragActive(false);
 
     const file = e.dataTransfer.files?.[0];
+
     if (file) handleFileSelect(file);
   };
 
@@ -49,7 +84,9 @@ export default function DataIngestion() {
           animate={{ opacity: 1, y: 0 }}
           className="card-elevated p-6 lg:col-span-2"
         >
-          <h3 className="text-sm font-semibold mb-4">Upload CSV</h3>
+          <h3 className="text-sm font-semibold mb-4">
+            Upload CSV
+          </h3>
 
           <div
             onDragOver={(e) => {
@@ -65,6 +102,7 @@ export default function DataIngestion() {
                 : "border-border hover:border-accent/50"
             }`}
           >
+
             <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-4" />
 
             <p className="text-sm font-medium mb-1">
@@ -79,9 +117,10 @@ export default function DataIngestion() {
               variant="outline"
               size="sm"
               className="gap-2"
+              disabled={loading}
             >
               <FileUp className="w-4 h-4" />
-              Browse Files
+              {loading ? "Uploading..." : "Browse Files"}
             </Button>
 
             <input
@@ -94,6 +133,7 @@ export default function DataIngestion() {
                 if (file) handleFileSelect(file);
               }}
             />
+
           </div>
         </motion.div>
 
@@ -101,12 +141,9 @@ export default function DataIngestion() {
 
         <div className="space-y-4">
 
-          {/* Manual Entry */}
-
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
             className="card-elevated p-6"
           >
             <h3 className="text-sm font-semibold mb-3">
@@ -126,12 +163,9 @@ export default function DataIngestion() {
             </Button>
           </motion.div>
 
-          {/* API Integration */}
-
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
             className="card-elevated p-6"
           >
             <div className="flex items-center gap-2 mb-3">
@@ -155,6 +189,7 @@ export default function DataIngestion() {
           </motion.div>
 
         </div>
+
       </div>
 
       {/* Recent Imports */}
@@ -162,7 +197,6 @@ export default function DataIngestion() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
         className="card-elevated p-6"
       >
         <h3 className="text-sm font-semibold mb-4">
@@ -171,30 +205,12 @@ export default function DataIngestion() {
 
         <div className="space-y-3">
 
-          {[
-            {
-              name: "events_q4_2024.csv",
-              rows: 245,
-              status: "success",
-              time: "2 hours ago",
-            },
-            {
-              name: "sponsors_jan.csv",
-              rows: 38,
-              status: "success",
-              time: "1 day ago",
-            },
-            {
-              name: "attendees_export.csv",
-              rows: 1200,
-              status: "error",
-              time: "3 days ago",
-            },
-          ].map((item) => (
+          {imports.map((item: any) => (
             <div
-              key={item.name}
+              key={item.id}
               className="flex items-center justify-between p-3 rounded-lg bg-muted/30"
             >
+
               <div className="flex items-center gap-3">
 
                 {item.status === "success" ? (
@@ -204,20 +220,25 @@ export default function DataIngestion() {
                 )}
 
                 <div>
+
                   <p className="text-sm font-medium">
-                    {item.name}
+                    {item.filename}
                   </p>
 
                   <p className="text-xs text-muted-foreground">
-                    {item.rows} rows • {item.time}
+                    {item.rows} rows •{" "}
+                    {new Date(item.createdAt).toLocaleString()}
                   </p>
+
                 </div>
 
               </div>
+
             </div>
           ))}
 
         </div>
+
       </motion.div>
 
     </div>
