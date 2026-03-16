@@ -1,15 +1,24 @@
 import express from "express";
+
+import {
+  getEventsController,
+  createEventController,
+  updateEventController,
+  deleteEventController
+} from "../controllers/events.js";
+
 import { authenticate } from "../middlewares/auth.js";
-import { authorize } from "../middlewares/role.js";
 
 const router = express.Router();
 
-router.get("/", authenticate, async (req, res) => {
-  res.json({ message: "Events list" });
-});
+/* ---------------- ROUTES ---------------- */
 
-router.post("/", authenticate, authorize("admin", "organizer"), async (req, res) => {
-  res.json({ message: "Event created" });
-});
+router.get("/", authenticate, getEventsController);
 
-export default route
+router.post("/", authenticate, createEventController);
+
+router.put("/:id", authenticate, updateEventController);
+
+router.delete("/:id", authenticate, deleteEventController);
+
+export default router;
