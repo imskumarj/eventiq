@@ -9,7 +9,7 @@ import { useState, useRef, useEffect } from "react";
 import {
   uploadCsv,
   getImports,
-} from "@/services/dataingestion";
+} from "@/services/ingestion";
 
 export default function DataIngestion() {
   const [dragActive, setDragActive] = useState(false);
