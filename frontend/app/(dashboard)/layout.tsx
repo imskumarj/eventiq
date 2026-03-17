@@ -3,7 +3,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import DashboardLayout from "../../components/DashboardLayout";
+import DashboardLayout from "@/components/DashboardLayout";
 
 export default function Layout({
   children,
