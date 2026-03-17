@@ -11,6 +11,7 @@ import eventsRoutes from "./routes/events.js";
 import sponsorsRoutes from "./routes/sponsors.js";
 import analyticsRoutes from "./routes/analytics.js";
 import ingestionRoutes from "./routes/ingestion.js";
+import reportsRoutes from "./routes/reports.js";
 
 const app = express();
 
@@ -73,6 +74,7 @@ app.use("/api/events", eventsRoutes);
 app.use("/api/sponsors", sponsorsRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/ingestion", ingestionRoutes);
+app.use("/api/reports", reportsRoutes);
 
 /*
  404 HANDLER
