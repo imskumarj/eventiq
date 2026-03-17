@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-import { Button } from "../../../components/ui/button";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
-import { Badge } from "../../../components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 
 import {
   Dialog,
@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../../components/ui/dialog";
+} from "@/components/ui/dialog";
 
 import {
   Table,
@@ -23,30 +23,43 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../../components/ui/table";
+} from "@/components/ui/table";
 
-import { Plus, Search, Eye } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 
-/* ---------------- MOCK DATA ---------------- */
-
-const sponsorsData = [
-  { id: 1, name: "TechCorp Global", event: "Tech Summit 2025", amount: 50000, boothVisits: 1240, leads: 89, roi: 340, status: "Active" },
-  { id: 2, name: "DataFlow Systems", event: "Data Conference", amount: 35000, boothVisits: 890, leads: 56, roi: 280, status: "Active" },
-  { id: 3, name: "CloudAI Solutions", event: "AI Expo Global", amount: 75000, boothVisits: 2100, leads: 142, roi: 420, status: "Active" },
-  { id: 4, name: "NetSys Inc", event: "DevOps World", amount: 25000, boothVisits: 560, leads: 34, roi: 190, status: "Pending" },
-  { id: 5, name: "DevHub Platform", event: "Cloud Innovation Forum", amount: 45000, boothVisits: 1100, leads: 78, roi: 310, status: "Active" },
-  { id: 6, name: "ByteInc", event: "Cybersecurity Week", amount: 30000, boothVisits: 750, leads: 48, roi: 260, status: "Completed" },
-];
-
-/* ---------------- PAGE ---------------- */
+import {
+  getSponsors,
+  createSponsor
+} from "@/services/sponsors";
 
 export default function Sponsors() {
+
+  const [sponsors, setSponsors] = useState<any[]>([]);
   const [search, setSearch] = useState("");
 
-  const filtered = sponsorsData.filter((s) =>
-    s.name.toLowerCase().includes(search.toLowerCase()) ||
-    s.event.toLowerCase().includes(search.toLowerCase())
-  );
+  const [form, setForm] = useState({
+    name: "",
+    eventId: "",
+    amount: 0,
+  });
+
+  /* ---------------- Fetch ---------------- */
+
+  async function fetchSponsors() {
+    const res = await getSponsors(search);
+    setSponsors(res.data);
+  }
+
+  useEffect(() => {
+    fetchSponsors();
+  }, [search]);
+
+  /* ---------------- Create ---------------- */
+
+  async function handleCreate() {
+    await createSponsor(form);
+    fetchSponsors();
+  }
 
   const getStatusStyle = (status: string) => {
     if (status === "Active") return "bg-success/10 text-success";
@@ -59,177 +72,115 @@ export default function Sponsors() {
 
       {/* Header */}
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex items-center justify-between"
-      >
+      <motion.div className="flex justify-between">
+
         <div>
           <h1 className="text-2xl font-bold">Sponsors</h1>
-          <p className="text-muted-foreground text-sm mt-1">
+          <p className="text-muted-foreground text-sm">
             Track sponsor performance and ROI
           </p>
         </div>
 
-        {/* Add Sponsor Dialog */}
-
         <Dialog>
           <DialogTrigger asChild>
-            <Button className="gap-2 gradient-accent text-accent-foreground hover:opacity-90">
+            <Button className="gap-2">
               <Plus className="w-4 h-4" />
               Add Sponsor
             </Button>
           </DialogTrigger>
 
-          <DialogContent className="sm:max-w-lg">
+          <DialogContent>
 
             <DialogHeader>
-              <DialogTitle>Add New Sponsor</DialogTitle>
+              <DialogTitle>Add Sponsor</DialogTitle>
             </DialogHeader>
 
-            <div className="space-y-4 pt-2">
+            <div className="space-y-4">
 
-              <div className="space-y-2">
-                <Label>Sponsor Name</Label>
-                <Input placeholder="Company name" />
-              </div>
+              <Input
+                placeholder="Sponsor name"
+                onChange={(e) =>
+                  setForm({ ...form, name: e.target.value })
+                }
+              />
 
-              <div className="space-y-2">
-                <Label>Associated Event</Label>
-                <Input placeholder="Select event" />
-              </div>
+              <Input
+                placeholder="Event ID"
+                onChange={(e) =>
+                  setForm({ ...form, eventId: e.target.value })
+                }
+              />
 
-              <div className="grid grid-cols-2 gap-4">
+              <Input
+                type="number"
+                placeholder="Investment"
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    amount: Number(e.target.value),
+                  })
+                }
+              />
 
-                <div className="space-y-2">
-                  <Label>Sponsorship Amount</Label>
-                  <Input type="number" placeholder="50000" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Tier</Label>
-                  <Input placeholder="Gold / Silver / Bronze" />
-                </div>
-
-              </div>
-
-              <Button className="w-full gradient-accent text-accent-foreground hover:opacity-90">
-                Add Sponsor
+              <Button onClick={handleCreate}>
+                Create
               </Button>
 
             </div>
 
           </DialogContent>
         </Dialog>
+
       </motion.div>
 
       {/* Search */}
 
-      <div className="flex gap-3">
-        <div className="relative flex-1 max-w-sm">
+      <Input
+        placeholder="Search sponsors..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+      {/* Table */}
 
-          <Input
-            placeholder="Search sponsors..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
+      <Table>
 
-        </div>
-      </div>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Sponsor</TableHead>
+            <TableHead>Event</TableHead>
+            <TableHead>Amount</TableHead>
+            <TableHead>Leads</TableHead>
+            <TableHead>ROI</TableHead>
+            <TableHead>Status</TableHead>
+          </TableRow>
+        </TableHeader>
 
-      {/* Sponsors Table */}
+        <TableBody>
 
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="card-elevated overflow-hidden"
-      >
+          {sponsors.map((s) => (
 
-        <div className="overflow-x-auto">
+            <TableRow key={s.id}>
 
-          <Table>
+              <TableCell>{s.name}</TableCell>
+              <TableCell>{s.event}</TableCell>
+              <TableCell>${s.amount}</TableCell>
+              <TableCell>{s.leads}</TableCell>
+              <TableCell>{s.roi}%</TableCell>
 
-            <TableHeader>
-              <TableRow className="bg-muted/30">
+              <TableCell>
+                <Badge className={getStatusStyle(s.status)}>
+                  {s.status}
+                </Badge>
+              </TableCell>
 
-                <TableHead>Sponsor</TableHead>
-                <TableHead>Event</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-                <TableHead className="text-right">Booth Visits</TableHead>
-                <TableHead className="text-right">Leads</TableHead>
-                <TableHead className="text-right">ROI</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-center">Actions</TableHead>
+            </TableRow>
 
-              </TableRow>
-            </TableHeader>
+          ))}
 
-            <TableBody>
+        </TableBody>
 
-              {filtered.map((sponsor) => (
-
-                <TableRow
-                  key={sponsor.id}
-                  className="hover:bg-muted/20 transition-colors"
-                >
-
-                  <TableCell className="font-medium">
-                    {sponsor.name}
-                  </TableCell>
-
-                  <TableCell className="text-muted-foreground">
-                    {sponsor.event}
-                  </TableCell>
-
-                  <TableCell className="text-right font-medium">
-                    ${sponsor.amount.toLocaleString()}
-                  </TableCell>
-
-                  <TableCell className="text-right">
-                    {sponsor.boothVisits.toLocaleString()}
-                  </TableCell>
-
-                  <TableCell className="text-right">
-                    {sponsor.leads}
-                  </TableCell>
-
-                  <TableCell className="text-right font-semibold text-success">
-                    {sponsor.roi}%
-                  </TableCell>
-
-                  <TableCell className="text-center">
-
-                    <Badge
-                      variant="secondary"
-                      className={getStatusStyle(sponsor.status)}
-                    >
-                      {sponsor.status}
-                    </Badge>
-
-                  </TableCell>
-
-                  <TableCell className="text-center">
-
-                    <button className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
-                      <Eye className="w-4 h-4" />
-                    </button>
-
-                  </TableCell>
-
-                </TableRow>
-
-              ))}
-
-            </TableBody>
-
-          </Table>
-
-        </div>
-
-      </motion.div>
+      </Table>
 
     </div>
   );
