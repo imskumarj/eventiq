@@ -13,6 +13,7 @@ import analyticsRoutes from "./routes/analytics.js";
 import ingestionRoutes from "./routes/ingestion.js";
 import reportsRoutes from "./routes/reports.js";
 import systemMetricsRoutes from "./routes/system-metrics.js";
+import dashboardRoutes from "./routes/dashboard.js";
 
 const app = express();
 
@@ -77,6 +78,7 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/api/ingestion", ingestionRoutes);
 app.use("/api/reports", reportsRoutes);
 app.use("/api/system-metrics", systemMetricsRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 /*
  404 HANDLER
