@@ -69,3 +69,12 @@ model ImportLog {
   status    String
   createdAt DateTime @default(now())
 }
+
+model Report {
+  id        String   @id @default(uuid())
+  name      String
+  type      String
+  format    String
+  fileUrl   String
+  createdAt DateTime @default(now())
+}
