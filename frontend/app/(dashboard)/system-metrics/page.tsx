@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import KpiCard from "../../../components/KpiCard";
+
+import KpiCard from "@/components/KpiCard";
 
 import {
   Activity,
@@ -22,70 +24,66 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const trafficData = [
-  { hour: "00", requests: 120 },
-  { hour: "04", requests: 45 },
-  { hour: "08", requests: 380 },
-  { hour: "12", requests: 520 },
-  { hour: "16", requests: 490 },
-  { hour: "20", requests: 310 },
-  { hour: "24", requests: 180 },
-];
-
-const errorData = [
-  { hour: "00", rate: 0.2 },
-  { hour: "04", rate: 0.1 },
-  { hour: "08", rate: 0.8 },
-  { hour: "12", rate: 1.2 },
-  { hour: "16", rate: 0.5 },
-  { hour: "20", rate: 0.3 },
-  { hour: "24", rate: 0.4 },
-];
+import { getSystemMetrics } from "@/services/system-metrics";
 
 export default function SystemMetrics() {
+
+  const [data, setData] = useState<any>(null);
+
+  async function fetchMetrics() {
+    const res = await getSystemMetrics();
+    setData(res.data);
+  }
+
+  useEffect(() => {
+    fetchMetrics();
+  }, []);
+
+  if (!data) return <div className="p-6">Loading...</div>;
+
   return (
     <div className="space-y-6 max-w-[1400px]">
 
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <motion.div>
         <h1 className="text-2xl font-bold">System Metrics</h1>
-        <p className="text-muted-foreground text-sm mt-1">
+        <p className="text-muted-foreground text-sm">
           Monitor platform health and performance
         </p>
       </motion.div>
 
       {/* KPI Cards */}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-4">
 
         <KpiCard
           title="API Requests Today"
-          value="12,847"
-          change="+18% from yesterday"
-          changeType="positive"
+          value={data.kpis.apiRequests}
+          change="Live data"
+          changeType="neutral"
           icon={Activity}
         />
 
         <KpiCard
-          title="DB Connections"
-          value="24"
-          change="Normal range"
-          changeType="neutral"
+          title="DB Latency"
+          value={`${data.kpis.dbConnections} ms`}
+          change="Healthy"
+          changeType="positive"
           icon={Database}
         />
 
         <KpiCard
           title="Error Rate"
-          value="0.3%"
-          change="-12% from yesterday"
-          changeType="positive"
+          value={`${data.kpis.errorRate}%`}
+          change="Live"
+          changeType="neutral"
           icon={AlertTriangle}
         />
 
         <KpiCard
           title="Avg Response Time"
-          value="142ms"
-          change="+5ms from yesterday"
-          changeType="negative"
+          value={`${data.kpis.avgResponseTime} ms`}
+          change="Live"
+          changeType="neutral"
           icon={Clock}
         />
 
@@ -93,89 +91,52 @@ export default function SystemMetrics() {
 
       {/* Charts */}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4">
 
-        {/* Traffic */}
-
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="card-elevated p-6"
-        >
+        <motion.div className="card-elevated p-6">
 
           <h3 className="text-sm font-semibold mb-4">
-            Traffic Trend (Today)
+            Traffic Trend
           </h3>
 
           <ResponsiveContainer width="100%" height={280}>
-
-            <AreaChart data={trafficData}>
-
+            <AreaChart data={data.traffic}>
               <CartesianGrid strokeDasharray="3 3" />
-
               <XAxis dataKey="hour" />
-
               <YAxis />
-
               <Tooltip />
-
-              <defs>
-                <linearGradient id="trafficGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(199,89%,48%)" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(199,89%,48%)" stopOpacity={0} />
-                </linearGradient>
-              </defs>
 
               <Area
                 type="monotone"
                 dataKey="requests"
                 stroke="hsl(199,89%,48%)"
-                strokeWidth={2.5}
-                fill="url(#trafficGrad)"
-                dot={false}
+                fillOpacity={0.2}
               />
-
             </AreaChart>
-
           </ResponsiveContainer>
 
         </motion.div>
 
-        {/* Error Rate */}
-
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="card-elevated p-6"
-        >
+        <motion.div className="card-elevated p-6">
 
           <h3 className="text-sm font-semibold mb-4">
             Error Rate Trend
           </h3>
 
           <ResponsiveContainer width="100%" height={280}>
-
-            <LineChart data={errorData}>
-
+            <LineChart data={data.errors}>
               <CartesianGrid strokeDasharray="3 3" />
-
               <XAxis dataKey="hour" />
-
-              <YAxis tickFormatter={(v:any) => `${v}%`} />
-
-              <Tooltip formatter={(value: number | undefined) => [`${value ?? 0}%`, "Error Rate"]} />
+              <YAxis />
+              <Tooltip />
 
               <Line
                 type="monotone"
                 dataKey="rate"
                 stroke="hsl(0,84%,60%)"
-                strokeWidth={2.5}
-                dot={false}
-                activeDot={{ r: 5 }}
+                strokeWidth={2}
               />
-
             </LineChart>
-
           </ResponsiveContainer>
 
         </motion.div>
