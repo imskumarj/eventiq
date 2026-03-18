@@ -74,9 +74,10 @@ export default function Events() {
   async function fetchEvents() {
     try {
       const res = await getEvents();
-      setEvents(res.data);
+      setEvents(Array.isArray(res?.data?.data) ? res.data.data : []);
     } catch (err) {
       console.error("Failed to fetch events");
+      setEvents([]);
     } finally {
       setLoading(false);
     }

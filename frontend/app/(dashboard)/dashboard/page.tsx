@@ -39,7 +39,7 @@ export default function Dashboard() {
   async function fetchData() {
     try {
       const res = await getDashboard();
-      setData(res.data);
+      setData(res?.data);
     } catch (err) {
       console.error(err);
     }
