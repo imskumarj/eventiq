@@ -29,20 +29,34 @@ import {
 
 import { getDashboard } from "@/services/dashboard";
 
+import { useAuth } from "@/contexts/AuthContext";
+
 export default function Dashboard() {
 
+  const { isLoading, isAuthenticated } = useAuth();
   const [data, setData] = useState<any>(null);
 
   async function fetchData() {
-    const res = await getDashboard();
-    setData(res.data);
+    try {
+      const res = await getDashboard();
+      setData(res.data);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (!isLoading && isAuthenticated) {
+      fetchData();
+    }
+  }, [isLoading, isAuthenticated]);
 
-  if (!data) return <div className="p-6">Loading...</div>;
+  if (isLoading) return <div className="p-6">Loading session...</div>;
+
+  if (!isAuthenticated)
+    return <div className="p-6">Please login first</div>;
+
+  if (!data) return <div className="p-6">Loading dashboard...</div>;
 
   return (
     <div className="space-y-6 max-w-[1400px]">
