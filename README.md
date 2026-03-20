@@ -2,7 +2,7 @@
 
 ## Intelligent Event Analytics Platform
 
-> Measure What Matters. Prove Event ROI with Data.
+> Measure What Matters, Prove Event ROI with Data.
 
 EventIQ is a production-grade analytics platform designed to help event organizers and sponsors measure event performance, analyze sponsor ROI, and generate actionable insights using structured event data.
 
@@ -446,5 +446,4 @@ AWS-focused Full Stack Developer
 ---
 
 # 📜 License
-
 MIT License
