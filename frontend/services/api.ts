@@ -35,11 +35,7 @@ export async function apiRequest(
 
   /* ✅ AUTO HANDLE AUTH FAIL */
   if (res.status === 401) {
-    localStorage.removeItem("eventiq_token");
-    localStorage.removeItem("eventiq_user");
-
-    window.location.href = "/login";
-    return;
+    throw new Error("Unauthorized");
   }
 
   if (!res.ok) {

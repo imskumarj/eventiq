@@ -38,14 +38,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("eventiq_user");
-    const token = localStorage.getItem("eventiq_token");
+    try {
+      const storedUser = localStorage.getItem("eventiq_user");
+      const token = localStorage.getItem("eventiq_token");
 
-    if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
+      if (
+        storedUser &&
+        storedUser !== "undefined" &&
+        storedUser !== "null" &&
+        token
+      ) {
+        setUser(JSON.parse(storedUser));
+      }
+    } catch (err) {
+      console.warn("Corrupted auth data, resetting...");
+      localStorage.removeItem("eventiq_user");
+      localStorage.removeItem("eventiq_token");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   }, []);
 
   const register = async (

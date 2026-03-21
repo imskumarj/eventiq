@@ -29,19 +29,25 @@ import {
 
 import { getDashboard } from "@/services/dashboard";
 
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Dashboard() {
 
   const { isLoading, isAuthenticated } = useAuth();
   const [data, setData] = useState<any>(null);
+  const router = useRouter();
 
   async function fetchData() {
     try {
       const res = await getDashboard();
       setData(res?.data);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      if (err.message === "Unauthorized") {
+        router.push("/login");
+      } else {
+        console.error(err);
+      }
     }
   }
 
