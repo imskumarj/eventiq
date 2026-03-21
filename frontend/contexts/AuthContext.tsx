@@ -18,6 +18,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isInitialized: boolean;
 
   register: (
     email: string,
@@ -36,6 +37,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     try {
@@ -50,12 +52,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       ) {
         setUser(JSON.parse(storedUser));
       }
-    } catch (err) {
-      console.warn("Corrupted auth data, resetting...");
+    } catch {
       localStorage.removeItem("eventiq_user");
       localStorage.removeItem("eventiq_token");
     } finally {
       setIsLoading(false);
+      setIsInitialized(true); // ✅ IMPORTANT
     }
   }, []);
 
@@ -87,12 +89,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const res = await loginUser({ email, password });
 
-      const { user, token } = res!.data;
+      const { user, token } = res.data;
 
-      setUser(user);
-
+      // ✅ SAVE FIRST
       localStorage.setItem("eventiq_user", JSON.stringify(user));
       localStorage.setItem("eventiq_token", token);
+
+      // ✅ THEN SET STATE
+      setUser(user);
+
     } finally {
       setIsLoading(false);
     }
@@ -110,6 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         isAuthenticated: !!user,
+        isInitialized,
         isLoading,
         register,
         login,

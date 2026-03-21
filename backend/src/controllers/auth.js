@@ -10,20 +10,25 @@ export async function registerUser(req, res, next) {
       data: result,
     });
   } catch (error) {
-    next(error);
+    res.status(error.status || 500).json({
+      message: error.message || "Server Error",
+    });
   }
 }
 
-export async function loginUser(req, res, next) {
+export async function loginUser(req, res) {
   try {
     const result = await authService.login(req.body);
 
-    res.json({
+    res.status(200).json({
       success: true,
       message: "Login successful",
       data: result,
     });
+
   } catch (error) {
-    next(error);
+    res.status(error.status || 500).json({
+      message: error.message || "Server Error",
+    });
   }
 }

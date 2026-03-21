@@ -10,13 +10,22 @@ export async function apiRequest(
       ? localStorage.getItem("eventiq_token")
       : null;
 
+  console.log("TOKEN SENT:", token);
+
+  // ✅ AUTH GUARD (skip for auth routes)
+  const isAuthRoute = endpoint.startsWith("/auth");
+
+  if (!token && !isAuthRoute) {
+    throw new Error("Unauthorized");
+  }
+
   const res = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
 
     headers: {
       "Content-Type": "application/json",
 
-      // ✅ Attach JWT
+      // ✅ Attach JWT only if exists
       ...(token && {
         Authorization: `Bearer ${token}`,
       }),
@@ -33,8 +42,14 @@ export async function apiRequest(
     data = null;
   }
 
-  /* ✅ AUTO HANDLE AUTH FAIL */
+  /* ✅ HANDLE 401 FROM BACKEND */
   if (res.status === 401) {
+    // optional cleanup (recommended)
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("eventiq_token");
+      localStorage.removeItem("eventiq_user");
+    }
+
     throw new Error("Unauthorized");
   }
 

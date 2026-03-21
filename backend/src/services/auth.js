@@ -10,7 +10,10 @@ export async function register(data) {
   });
 
   if (existingUser) {
-    throw new Error("Email already registered");
+    throw {
+      status: 400,
+      message: "Email already registered",
+    };
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -48,13 +51,19 @@ export async function login(data) {
   });
 
   if (!user) {
-    throw new Error("Invalid credentials");
+    throw {
+      status: 401,
+      message: "Invalid email or password",
+    };
   }
 
   const validPassword = await bcrypt.compare(password, user.password);
 
   if (!validPassword) {
-    throw new Error("Invalid credentials");
+    throw {
+      status: 401,
+      message: "Invalid email or password",
+    };
   }
 
   const token = generateToken({

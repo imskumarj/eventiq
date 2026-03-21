@@ -34,33 +34,45 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function Dashboard() {
 
-  const { isLoading, isAuthenticated } = useAuth();
+  const { isLoading, isAuthenticated, isInitialized } = useAuth();
   const [data, setData] = useState<any>(null);
   const router = useRouter();
+
+  if (!isInitialized) {
+    return <div className="p-6">Initializing...</div>;
+  }
+
+  useEffect(() => {
+    if (isInitialized && !isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [isInitialized, isAuthenticated]);
 
   async function fetchData() {
     try {
       const res = await getDashboard();
       setData(res?.data);
     } catch (err: any) {
-      if (err.message === "Unauthorized") {
+      console.error("Dashboard Error:", err);
+      if (err.message === "Unauthorized" && isAuthenticated) {
         router.push("/login");
-      } else {
-        console.error(err);
-      }
+      } 
     }
   }
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (isInitialized && isAuthenticated) {
       fetchData();
     }
-  }, [isLoading, isAuthenticated]);
+  }, [isInitialized, isAuthenticated]);
 
   if (isLoading) return <div className="p-6">Loading session...</div>;
 
-  if (!isAuthenticated)
-    return <div className="p-6">Please login first</div>;
+  // ✅ Wait until token exists
+  const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem("eventiq_token")
+      : null;
 
   if (!data) return <div className="p-6">Loading dashboard...</div>;
 
