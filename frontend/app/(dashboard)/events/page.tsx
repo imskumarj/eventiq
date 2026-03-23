@@ -33,6 +33,7 @@ import {
 
 import {
   getEvents,
+  getEventById,
   createEvent,
   updateEvent,
   deleteEvent,
@@ -56,6 +57,8 @@ export default function Events() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const formRef = useRef<HTMLDivElement | null>(null);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [showEventView, setShowEventView] = useState(false);
 
   const { user } = useAuth();
   const isSponsor = user?.role === "sponsor";
@@ -135,6 +138,17 @@ export default function Events() {
       fetchEvents();
     } catch {
       console.error("Delete failed");
+    }
+  }
+
+  /* ---------------- Event Details View ---------------- */
+  async function handleViewEvent(id: string) {
+    try {
+      const res = await getEventById(id);
+      setSelectedEvent(res.data.data);
+      setShowEventView(true);
+    } catch (err) {
+      console.error("Failed to fetch event details");
     }
   }
 
@@ -297,12 +311,22 @@ export default function Events() {
 
                 <TableCell className="text-center">
                   <div className="flex justify-center gap-1">
+                    {/* 👁 VIEW */}
+                    <button
+                      onClick={() => handleViewEvent(event.id)}
+                      className={`p-1.5 rounded-md ${isSponsor ? "opacity-50 cursor-not-allowed" : "hover:bg-destructive/10 hover:text-destructive"}`}
+                      disabled={isSponsor}
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+
+                    {/* ✏️ EDIT */}
                     <button
                       onClick={() => {
                         setEditingEventId(event.id);
                         setForm({
                           name: event.name,
-                          date: event.date.split("T")[0], // important for input[type=date]
+                          date: event.date.split("T")[0],
                           location: event.location,
                           attendees: event.attendees,
                           revenue: event.revenue,
@@ -315,6 +339,7 @@ export default function Events() {
                       <Pencil className="w-4 h-4" />
                     </button>
 
+                    {/* 🗑 DELETE */}
                     <button
                       onClick={() => handleDelete(event.id)}
                       disabled={isSponsor}
@@ -322,6 +347,7 @@ export default function Events() {
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
+
                   </div>
                 </TableCell>
 
@@ -470,6 +496,113 @@ export default function Events() {
                   Cancel
                 </Button>
               </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showEventView && selectedEvent && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="card-elevated p-6"
+          >
+            {/* HEADER */}
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-lg font-semibold">Event Details</h2>
+                <p className="text-sm text-muted-foreground">
+                  Complete breakdown of this event
+                </p>
+              </div>
+
+              <button
+                onClick={() => setShowEventView(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-muted"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* EVENT INFO */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div>
+                <Label>Name</Label>
+                <p className="text-sm">{selectedEvent.name}</p>
+              </div>
+
+              <div>
+                <Label>Date</Label>
+                <p className="text-sm">
+                  {new Date(selectedEvent.date).toLocaleDateString()}
+                </p>
+              </div>
+
+              <div>
+                <Label>Location</Label>
+                <p className="text-sm">{selectedEvent.location}</p>
+              </div>
+
+              <div>
+                <Label>Revenue</Label>
+                <p className="text-sm">₹{selectedEvent.revenue}</p>
+              </div>
+
+              <div>
+                <Label>Attendees</Label>
+                <p className="text-sm">{selectedEvent.attendees}</p>
+              </div>
+
+              <div>
+                <Label>Engagement</Label>
+                <p className="text-sm">{selectedEvent.engagement}%</p>
+              </div>
+            </div>
+
+            {/* ORGANIZER */}
+            <div className="mb-6">
+              <h3 className="font-semibold mb-2">Organizer</h3>
+
+              <div className="bg-muted/40 rounded-lg p-3 text-sm">
+                <p><strong>Name:</strong> {selectedEvent.organizer?.name}</p>
+                <p><strong>Email:</strong> {selectedEvent.organizer?.email}</p>
+              </div>
+            </div>
+
+            {/* SPONSORS */}
+            <div>
+              <h3 className="font-semibold mb-2">Sponsors</h3>
+
+              {selectedEvent?.sponsors?.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No sponsors added
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {selectedEvent?.sponsors?.map((s: any) => (
+                    <div
+                      key={s.id}
+                      className="flex justify-between items-center p-3 rounded-lg bg-muted/40"
+                    >
+                      <div>
+                        <p className="text-sm font-medium">{s.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Leads: {s.leads} • Visits: {s.boothVisits}
+                        </p>
+                      </div>
+
+                      <div className="text-right text-sm">
+                        <p>₹{s.investment}</p>
+                        <p className="text-xs text-muted-foreground">
+                          ROI: {s.roi}%
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </motion.div>
         )}

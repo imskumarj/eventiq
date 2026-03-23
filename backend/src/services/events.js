@@ -71,6 +71,88 @@ export async function getEvents({ search, page = 1, limit = 10, user }) {
   };
 }
 
+/* ---------------- GET EVENT BY ID ---------------- */
+
+export async function getEventById(id, user) {
+
+  /* -------- FETCH EVENT WITH RELATIONS -------- */
+
+  const event = await prisma.event.findUnique({
+    where: { id },
+    include: {
+      organizer: {
+        select: {
+          id: true,
+          name: true,
+          email: true
+        }
+      },
+      sponsors: {
+        include: {
+          sponsor: true
+        }
+      }
+    }
+  });
+
+  if (!event) {
+    throw new Error("Event not found");
+  }
+
+  /* ---------------- RBAC CHECK ---------------- */
+
+  if (user.role === "organizer") {
+    if (event.organizerId !== user.id) {
+      throw new Error("Unauthorized access");
+    }
+  }
+
+  if (user.role === "sponsor") {
+    const isLinked = event.sponsors.some(
+      (s) => s.sponsor.userId === user.id
+    );
+
+    if (!isLinked) {
+      throw new Error("Unauthorized access");
+    }
+  }
+
+  /* ---------------- FORMAT SPONSORS ---------------- */
+
+  const sponsors = event.sponsors.map((s) => {
+
+    const roi =
+      s.investment > 0
+        ? Math.round((s.leads * 1000) / s.investment)
+        : 0;
+
+    return {
+      id: s.id,
+      name: s.sponsor.name,
+      investment: s.investment,
+      boothVisits: s.boothVisits,
+      leads: s.leads,
+      roi
+    };
+  });
+
+  /* ---------------- RETURN CLEAN DATA ---------------- */
+
+  return {
+    id: event.id,
+    name: event.name,
+    date: event.date,
+    location: event.location,
+    revenue: event.revenue,
+    attendees: event.attendees,
+    engagement: event.engagement,
+
+    organizer: event.organizer,
+
+    sponsors
+  };
+}
+
 /* ---------------- CREATE EVENT ---------------- */
 
 export async function createEvent(data, userId) {

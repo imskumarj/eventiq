@@ -6,6 +6,12 @@ export async function getEvents() {
   });
 }
 
+export async function getEventById(id: string) {
+  return apiRequest(`/events/${id}`, {
+    method: "GET",
+  });
+}
+
 export async function createEvent(data: {
   name: string;
   date: string;

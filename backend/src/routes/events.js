@@ -2,6 +2,7 @@ import express from "express";
 
 import {
   getEventsController,
+  getEventByIdController,
   createEventController,
   updateEventController,
   deleteEventController
@@ -14,6 +15,8 @@ const router = express.Router();
 /* ---------------- ROUTES ---------------- */
 
 router.get("/", authenticate, getEventsController);
+
+router.get("/:id", authenticate, getEventByIdController);
 
 router.post("/", authenticate, createEventController);
 

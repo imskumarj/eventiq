@@ -34,6 +34,37 @@ export async function getEventsController(req, res) {
 
 }
 
+import { getEventById } from "../services/events.js";
+
+/* ---------------- GET EVENT BY ID ---------------- */
+
+export async function getEventByIdController(req, res) {
+
+  try {
+
+    const event = await getEventById(
+      req.params.id,
+      req.user   // 🔥 IMPORTANT
+    );
+
+    res.json({
+      success: true,
+      data: event
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(403).json({
+      success: false,
+      message: error.message || "Failed to fetch event"
+    });
+
+  }
+
+}
+
 /* ---------------- CREATE EVENT ---------------- */
 
 export async function createEventController(req, res) {
