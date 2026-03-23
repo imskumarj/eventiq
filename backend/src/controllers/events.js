@@ -16,7 +16,8 @@ export async function getEventsController(req, res) {
     const data = await getEvents({
       search,
       page: Number(page) || 1,
-      limit: Number(limit) || 10
+      limit: Number(limit) || 10,
+      user: req.user // 🔥 IMPORTANT
     });
 
     res.json(data);

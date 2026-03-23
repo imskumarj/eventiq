@@ -2,11 +2,39 @@ import prisma from "../config/db.js";
 
 /* ---------------- GET EVENTS ---------------- */
 
-export async function getEvents({ search, page = 1, limit = 10 }) {
+export async function getEvents({ search, page = 1, limit = 10, user }) {
 
   const skip = (page - 1) * limit;
 
-  const where = search
+  /* ---------------- ROLE-BASED FILTER ---------------- */
+
+  let roleFilter = {};
+
+  if (user.role === "admin") {
+    roleFilter = {}; // no restriction
+  }
+
+  if (user.role === "organizer") {
+    roleFilter = {
+      organizerId: user.id
+    };
+  }
+
+  if (user.role === "sponsor") {
+    roleFilter = {
+      sponsors: {
+        some: {
+          sponsor: {
+            userId: user.id
+          }
+        }
+      }
+    };
+  }
+
+  /* ---------------- SEARCH FILTER ---------------- */
+
+  const searchFilter = search
     ? {
         OR: [
           { name: { contains: search, mode: "insensitive" } },
@@ -14,6 +42,15 @@ export async function getEvents({ search, page = 1, limit = 10 }) {
         ]
       }
     : {};
+
+  /* ---------------- FINAL WHERE ---------------- */
+
+  const where = {
+    AND: [
+      roleFilter,
+      searchFilter
+    ]
+  };
 
   const [events, total] = await Promise.all([
     prisma.event.findMany({

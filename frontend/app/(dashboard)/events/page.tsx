@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 import {
   Table,
@@ -54,6 +56,10 @@ export default function Events() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const formRef = useRef<HTMLDivElement | null>(null);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
+
+  const { user } = useAuth();
+  const isSponsor = user?.role === "sponsor";
+  const [sponsorWarning, setSponsorWarning] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -184,8 +190,18 @@ export default function Events() {
         </div>
 
         <Button
-          onClick={() => setShowCreateForm((prev) => !prev)}
-          className="gap-2 gradient-accent text-accent-foreground"
+          onClick={() => {
+            if (isSponsor) {
+              setSponsorWarning(true);
+              return;
+            }
+            setShowCreateForm((prev) => !prev);
+          }}
+          className={cn(
+            "gap-2 text-accent-foreground",
+            isSponsor ? "bg-muted text-muted-foreground cursor-not-allowed" : "gradient-accent"
+          )}
+          disabled={isSponsor}
         >
           <Plus className="w-4 h-4" />
           Add Event
@@ -231,7 +247,7 @@ export default function Events() {
             {paginated.map((event) => (
               <TableRow key={event.id} className="text-center">
 
-                <TableCell className="text-center">
+                <TableCell className="text-center py-4">
                   <div className="flex items-center justify-center gap-2">
 
                     {/* Short ID */}
@@ -250,23 +266,23 @@ export default function Events() {
                   </div>
                 </TableCell>
 
-                <TableCell className="font-medium text-center">
+                <TableCell className="font-medium text-center py-4">
                   {event.name}
                 </TableCell>
 
-                <TableCell className="text-center">
+                <TableCell className="text-center py-4">
                   {new Date(event.date).toLocaleDateString()}
                 </TableCell>
 
-                <TableCell className="text-center">
+                <TableCell className="text-center py-4">
                   {event.location}
                 </TableCell>
 
-                <TableCell className="text-center">
+                <TableCell className="text-center py-4">
                   {event.attendees.toLocaleString()}
                 </TableCell>
 
-                <TableCell className="text-center">
+                <TableCell className="text-center py-4">
                   ₹{event.revenue.toLocaleString()}
                 </TableCell>
 
@@ -293,14 +309,16 @@ export default function Events() {
                         });
                         setShowCreateForm(true);
                       }}
-                      className="p-1.5 rounded-md hover:bg-muted"
+                      disabled={isSponsor}
+                      className={`p-1.5 rounded-md ${isSponsor ? "opacity-50 cursor-not-allowed" : "hover:bg-muted"}`}
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
 
                     <button
                       onClick={() => handleDelete(event.id)}
-                      className="p-1.5 rounded-md hover:bg-destructive/10 hover:text-destructive"
+                      disabled={isSponsor}
+                      className={`p-1.5 rounded-md ${isSponsor ? "opacity-50 cursor-not-allowed" : "hover:bg-destructive/10 hover:text-destructive"}`}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
