@@ -73,19 +73,12 @@ export default function TopNavbar() {
               <p className="text-xs text-muted-foreground">{user?.email}</p>
             </div>
 
-            <DropdownMenuSeparator />
-
-            {/* <DropdownMenuItem>Profile Settings</DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem> */}
-
-            <DropdownMenuSeparator />
-
             <DropdownMenuItem
               onClick={() => {
                 logout();
                 router.push("/login");
               }}
-              className="text-destructive"
+              className="text-destructive text-xs px-3 py-2"
             >
               Sign out
             </DropdownMenuItem>
