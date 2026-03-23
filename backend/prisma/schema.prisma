@@ -22,6 +22,7 @@ model User {
   createdAt DateTime @default(now())
 
   events Event[] @relation("OrganizerEvents")
+  sponsor Sponsor?
 }
 
 model Event {
@@ -44,6 +45,8 @@ model Sponsor {
   id        String   @id @default(uuid())
   name      String
   createdAt DateTime @default(now())
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id])
 
   sponsorships Sponsorship[]
 }

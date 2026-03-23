@@ -32,10 +32,8 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard", roles: ["admin", "sponsor", "organizer"] },
   { label: "Events", icon: Calendar, path: "/events", roles: ["admin", "organizer"] },
-  { label: "My Events", icon: Calendar, path: "/events", roles: ["sponsor"] },
   { label: "Sponsors", icon: Users, path: "/sponsors", roles: ["admin", "organizer"] },
   { label: "Analytics", icon: BarChart3, path: "/analytics", roles: ["admin"] },
-  { label: "ROI Analytics", icon: TrendingUp, path: "/analytics", roles: ["sponsor"] },
   { label: "Reports", icon: FileText, path: "/reports", roles: ["admin", "sponsor", "organizer"] },
   { label: "Data Ingestion", icon: Database, path: "/data-ingestion", roles: ["admin"] },
   { label: "System Metrics", icon: Activity, path: "/system-metrics", roles: ["admin"] },

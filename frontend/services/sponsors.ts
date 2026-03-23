@@ -8,11 +8,16 @@ export async function getSponsors(search = "") {
 
 export async function createSponsor(data: {
   name: string;
+  email: string;
   eventId: string;
   amount: number;
 }) {
-  return apiRequest("/sponsors", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+  try {
+    return await apiRequest("/sponsors", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  } catch (err: any) {
+    throw new Error(err.message || "Failed to create sponsor");
+  }
 }
