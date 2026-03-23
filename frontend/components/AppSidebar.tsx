@@ -16,6 +16,7 @@ import {
   ChevronRight,
   LogOut,
   TrendingUp,
+  LucideIcon,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { useState } from "react";
@@ -23,21 +24,21 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface NavItem {
   label: string;
-  icon: React.ReactNode;
+  icon: LucideIcon;
   path: string;
   roles: string[];
 }
 
 const navItems: NavItem[] = [
-  { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, path: "/dashboard", roles: ["admin", "sponsor", "organizer"] },
-  { label: "Events", icon: <Calendar className="w-5 h-5" />, path: "/events", roles: ["admin", "organizer"] },
-  { label: "My Events", icon: <Calendar className="w-5 h-5" />, path: "/events", roles: ["sponsor"] },
-  { label: "Sponsors", icon: <Users className="w-5 h-5" />, path: "/sponsors", roles: ["admin", "organizer"] },
-  { label: "Analytics", icon: <BarChart3 className="w-5 h-5" />, path: "/analytics", roles: ["admin"] },
-  { label: "ROI Analytics", icon: <TrendingUp className="w-5 h-5" />, path: "/analytics", roles: ["sponsor"] },
-  { label: "Reports", icon: <FileText className="w-5 h-5" />, path: "/reports", roles: ["admin", "sponsor", "organizer"] },
-  { label: "Data Ingestion", icon: <Database className="w-5 h-5" />, path: "/data-ingestion", roles: ["admin"] },
-  { label: "System Metrics", icon: <Activity className="w-5 h-5" />, path: "/system-metrics", roles: ["admin"] },
+  { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard", roles: ["admin", "sponsor", "organizer"] },
+  { label: "Events", icon: Calendar, path: "/events", roles: ["admin", "organizer"] },
+  { label: "My Events", icon: Calendar, path: "/events", roles: ["sponsor"] },
+  { label: "Sponsors", icon: Users, path: "/sponsors", roles: ["admin", "organizer"] },
+  { label: "Analytics", icon: BarChart3, path: "/analytics", roles: ["admin"] },
+  { label: "ROI Analytics", icon: TrendingUp, path: "/analytics", roles: ["sponsor"] },
+  { label: "Reports", icon: FileText, path: "/reports", roles: ["admin", "sponsor", "organizer"] },
+  { label: "Data Ingestion", icon: Database, path: "/data-ingestion", roles: ["admin"] },
+  { label: "System Metrics", icon: Activity, path: "/system-metrics", roles: ["admin"] },
 ];
 
 export default function AppSidebar() {
@@ -52,9 +53,9 @@ export default function AppSidebar() {
 
   return (
     <motion.aside
-      animate={{ width: collapsed ? 72 : 260 }}
+      animate={{ width: collapsed ? 80 : 260 }}
       transition={{ duration: 0.2 }}
-      className="fixed inset-y-0 left-0 h-screen w-[260px] flex flex-col bg-sidebar border-r border-sidebar-border z-30 overflow-hidden"
+      className="fixed inset-y-0 left-0 h-screen flex flex-col bg-sidebar border-r border-sidebar-border z-30 overflow-hidden"
     >
       {/* 🔥 HEADER */}
       <div className="h-16 py-4 flex items-center justify-between px-4 border-b border-sidebar-border gap-2">
@@ -72,7 +73,7 @@ export default function AppSidebar() {
 
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-sidebar-accent/50 transition"
+          className="w-8 h-8 rounded-lg flex items-center justify-center bg-sidebar-accent hover:bg-sidebar-accent/50 transition"
         >
           {collapsed ? (
             <ChevronRight className="w-4 h-4" />
@@ -83,9 +84,10 @@ export default function AppSidebar() {
       </div>
 
       {/* 🔥 NAV */}
-      <nav className="flex-1 min-h-0 py-4 px-3 space-y-1 overflow-y-auto">
+      <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
         {filteredItems.map((item) => {
-          const isActive = pathname === item.path;
+          const isActive = pathname.startsWith(item.path);
+          const Icon = item.icon;
 
           return (
             <Link
@@ -94,23 +96,34 @@ export default function AppSidebar() {
               className={cn(
                 "flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all",
                 isActive
-                  ? "gradient-accent text-white shadow-sm"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  ? "gradient-accent text-white shadow-sm !text-white"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-white"
               )}
             >
-              {item.icon}
+              <div className={cn(isActive && "text-white")}>
+                <Icon
+                  className="w-5 h-5"
+                  color={isActive ? "white" : undefined}
+                />
+              </div>
 
-              {!collapsed && <span>{item.label}</span>}
+              {!collapsed && (
+                <span style={{ color: isActive ? "white" : undefined }}>
+                  {item.label}
+                </span>
+              )}
             </Link>
           );
         })}
       </nav>
 
       {/* 🔥 USER */}
-      <div className="sticky bottom-0 p-3 border-t border-sidebar-border bg-sidebar">
+      <div className="p-3 border-t border-sidebar-border mt-auto">
         <div className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-sidebar-accent transition">
           <div className="w-8 h-8 rounded-full gradient-accent flex items-center justify-center text-xs font-bold text-white">
-            {user?.name?.charAt(0).toUpperCase()}
+            <span style={{ color: "white" }}>
+              {user?.name?.charAt(0).toUpperCase()}
+            </span>
           </div>
 
           {!collapsed && (
