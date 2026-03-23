@@ -2,23 +2,85 @@ import prisma from "../config/db.js";
 
 /* ---------------- DASHBOARD DATA ---------------- */
 
-export async function getDashboardData() {
+export async function getDashboardData(user) {
 
-  /* -------- KPIs -------- */
+  /* ---------------- ROLE FILTERS ---------------- */
 
-  const totalEvents = await prisma.event.count();
+  let eventFilter = {};
+  let sponsorshipFilter = {};
 
-  const totalSponsors = await prisma.sponsor.count();
+  if (user.role === "organizer") {
+    eventFilter = { organizerId: user.id };
+    sponsorshipFilter = {
+      event: { organizerId: user.id }
+    };
+  }
 
-  const totalRevenueAgg = await prisma.event.aggregate({
-    _sum: { revenue: true }
+  if (user.role === "sponsor") {
+    eventFilter = {
+      sponsors: {
+        some: {
+          sponsor: {
+            userId: user.id
+          }
+        }
+      }
+    };
+
+    sponsorshipFilter = {
+      sponsor: {
+        userId: user.id
+      }
+    };
+  }
+
+  /* ---------------- EVENTS ---------------- */
+
+  const events = await prisma.event.findMany({
+    where: eventFilter
   });
 
-  const totalRevenue = totalRevenueAgg._sum.revenue || 0;
+  const totalEvents = events.length;
 
-  /* -------- ROI -------- */
+  /* ---------------- SPONSORS ---------------- */
 
-  const sponsorships = await prisma.sponsorship.findMany();
+  let totalSponsors = 0;
+
+  if (user.role === "admin") {
+    totalSponsors = await prisma.sponsor.count();
+  }
+
+  if (user.role === "organizer") {
+    const sponsorships = await prisma.sponsorship.findMany({
+      where: {
+        event: { organizerId: user.id }
+      },
+      select: { sponsorId: true }
+    });
+
+    const uniqueSponsors = new Set(
+      sponsorships.map((s) => s.sponsorId)
+    );
+
+    totalSponsors = uniqueSponsors.size;
+  }
+
+  if (user.role === "sponsor") {
+    totalSponsors = 1;
+  }
+
+  /* ---------------- REVENUE ---------------- */
+
+  const totalRevenue = events.reduce(
+    (sum, e) => sum + (e.revenue || 0),
+    0
+  );
+
+  /* ---------------- ROI ---------------- */
+
+  const sponsorships = await prisma.sponsorship.findMany({
+    where: sponsorshipFilter
+  });
 
   let totalROI = 0;
 
@@ -33,9 +95,7 @@ export async function getDashboardData() {
       ? Math.round(totalROI / sponsorships.length)
       : 0;
 
-  /* -------- Revenue Trend (Monthly) -------- */
-
-  const events = await prisma.event.findMany();
+  /* ---------------- REVENUE TREND ---------------- */
 
   const revenueMap = {};
 
@@ -58,13 +118,14 @@ export async function getDashboardData() {
     })
   );
 
-  /* -------- ROI Per Sponsor -------- */
+  /* ---------------- ROI PER SPONSOR ---------------- */
 
-  const roiData = await prisma.sponsorship.findMany({
+  const roiDataRaw = await prisma.sponsorship.findMany({
+    where: sponsorshipFilter,
     include: { sponsor: true }
   });
 
-  const roiFormatted = roiData.map((s) => ({
+  const roiData = roiDataRaw.map((s) => ({
     sponsor: s.sponsor.name,
     roi:
       s.investment > 0
@@ -80,6 +141,6 @@ export async function getDashboardData() {
       avgROI
     },
     revenueData,
-    roiData: roiFormatted
+    roiData
   };
 }

@@ -4,7 +4,7 @@ export async function getDashboardController(req, res) {
 
   try {
 
-    const data = await getDashboardData();
+    const data = await getDashboardData(req.user); // 🔥 PASS USER
 
     res.json(data);
 

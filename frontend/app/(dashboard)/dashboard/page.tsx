@@ -119,7 +119,7 @@ export default function Dashboard() {
 
         <KpiCard
           title="Total Revenue"
-          value={`$${data.kpis.totalRevenue}`}
+          value={`₹${data.kpis.totalRevenue}`}
           change="Live"
           changeType="positive"
           icon={DollarSign}
