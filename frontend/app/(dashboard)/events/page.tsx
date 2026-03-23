@@ -26,6 +26,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Copy,
 } from "lucide-react";
 
 import {
@@ -163,6 +164,10 @@ export default function Events() {
     );
   }
 
+  function copyToClipboard(text: string) {
+    navigator.clipboard.writeText(text);
+  }
+
   return (
     <div className="space-y-6 max-w-[1400px]">
       {/* Header */}
@@ -211,6 +216,7 @@ export default function Events() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="py-4 bg-muted text-center">Event ID</TableHead>
               <TableHead className="py-4 bg-muted">Event</TableHead>
               <TableHead className="py-4 bg-muted">Date</TableHead>
               <TableHead className="py-4 bg-muted">Location</TableHead>
@@ -224,6 +230,25 @@ export default function Events() {
           <TableBody>
             {paginated.map((event) => (
               <TableRow key={event.id} className="text-center">
+
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center gap-2">
+
+                    {/* Short ID */}
+                    <span className="text-xs font-mono text-muted-foreground">
+                      {event.id.slice(0, 5)}...
+                    </span>
+
+                    {/* Copy Button */}
+                    <button
+                      onClick={() => copyToClipboard(event.id)}
+                      className="p-1 rounded hover:bg-muted transition"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+
+                  </div>
+                </TableCell>
 
                 <TableCell className="font-medium text-center">
                   {event.name}
