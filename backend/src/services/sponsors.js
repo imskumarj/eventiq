@@ -54,23 +54,70 @@ export async function getSponsors({ search }) {
 
 /* ---------------- CREATE SPONSOR ---------------- */
 
+/* ---------------- CREATE SPONSOR ---------------- */
+
 export async function createSponsor(data) {
 
-  const sponsor = await prisma.sponsor.create({
-    data: {
-      name: data.name
-    }
+  const { name, email, eventId, amount } = data;
+
+  /* -------- 1. CHECK USER -------- */
+
+  const user = await prisma.user.findUnique({
+    where: { email }
   });
+
+  if (!user) {
+    throw new Error("User not registered");
+  }
+
+  if (user.role !== "sponsor") {
+    throw new Error("User is not registered as sponsor");
+  }
+
+  /* -------- 2. CHECK IF ALREADY LINKED -------- */
+
+  let sponsor = await prisma.sponsor.findUnique({
+    where: { userId: user.id }
+  });
+
+  /* -------- 3. CREATE SPONSOR IF NOT EXISTS -------- */
+
+  if (!sponsor) {
+    sponsor = await prisma.sponsor.create({
+      data: {
+        name,
+        userId: user.id
+      }
+    });
+  }
+
+  /* -------- 4. VALIDATE EVENT -------- */
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId }
+  });
+
+  if (!event) {
+    throw new Error("Invalid event ID");
+  }
+
+  /* -------- 5. CREATE SPONSORSHIP -------- */
 
   const sponsorship = await prisma.sponsorship.create({
     data: {
       sponsorId: sponsor.id,
-      eventId: data.eventId,
-      investment: Number(data.amount),
+      eventId,
+      investment: Number(amount),
       boothVisits: 0,
       leads: 0
     }
   });
 
-  return { sponsor, sponsorship };
+  return {
+    success: true,
+    data: {
+      sponsor,
+      sponsorship
+    }
+  };
 }

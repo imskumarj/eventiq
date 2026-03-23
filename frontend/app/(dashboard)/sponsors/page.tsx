@@ -95,9 +95,8 @@ export default function Sponsors() {
   /* ---------------- UI ---------------- */
 
   const getStatusStyle = (roi: number) => {
-    if (roi > 150) return "bg-success/10 text-success";
-    if (roi > 100) return "bg-info/10 text-info";
-    return "bg-warning/10 text-warning";
+    if (roi > 100) return "bg-green-600";
+    return "bg-red-600";
   };
 
   useEffect(() => {
@@ -156,14 +155,17 @@ export default function Sponsors() {
           <TableBody>
             {sponsors.map((s) => (
               <TableRow key={s.id} className="text-center">
-                <TableCell>{s.name}</TableCell>
-                <TableCell>{s.eventName}</TableCell>
-                <TableCell>₹{s.amount}</TableCell>
-                <TableCell>{s.leads}</TableCell>
-                <TableCell>{s.roi}%</TableCell>
+                <TableCell className="py-4">{s.name}</TableCell>
+                <TableCell className="py-4">{s.event}</TableCell>
+                <TableCell className="py-4">₹{s.amount}</TableCell>
+                <TableCell className="py-4">{s.leads}</TableCell>
+                <TableCell className="py-4">{s.roi}%</TableCell>
 
-                <TableCell>
-                  <Badge className={getStatusStyle(s.roi)}>
+                <TableCell className="py-4">
+                  <Badge 
+                    className={`${getStatusStyle(s.roi)} px-3 py-1`}
+                    style={{ color: "white" }}
+                  >
                     {s.roi > 100 ? "Active" : "Low"}
                   </Badge>
                 </TableCell>

@@ -96,8 +96,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const { user, token } = res.data.data;
 
-      console.log("TOKEN SAVED:", token); // 👈 ADD THIS
-
       localStorage.setItem("eventiq_user", JSON.stringify(user));
       localStorage.setItem("eventiq_token", token);
 

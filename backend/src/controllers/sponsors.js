@@ -13,13 +13,17 @@ export async function getSponsorsController(req, res) {
 
     const data = await getSponsors({ search });
 
-    res.json(data);
+    res.json({
+      success: true,
+      data
+    });
 
   } catch (error) {
 
     console.error(error);
 
     res.status(500).json({
+      success: false,
       message: "Failed to fetch sponsors"
     });
 
@@ -33,16 +37,17 @@ export async function createSponsorController(req, res) {
 
   try {
 
-    const sponsor = await createSponsor(req.body);
+    const result = await createSponsor(req.body);
 
-    res.status(201).json(sponsor);
+    res.status(201).json(result);
 
   } catch (error) {
 
     console.error(error);
 
-    res.status(500).json({
-      message: "Failed to create sponsor"
+    res.status(400).json({
+      success: false,
+      message: error.message || "Failed to create sponsor"
     });
 
   }

@@ -10,15 +10,8 @@ export async function apiRequest(
       ? localStorage.getItem("eventiq_token")
       : null;
 
-  console.log("TOKEN SENT:", token);
-
   // ✅ AUTH GUARD (skip for auth routes)
   const isAuthRoute = endpoint.startsWith("/auth");
-
-  if (!token && !isAuthRoute) {
-    // let backend handle it instead
-    console.warn("No token found");
-  }
 
   const res = await fetch(`${API_BASE}${endpoint}`, {
     ...options,

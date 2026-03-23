@@ -42,7 +42,6 @@ export default function Dashboard() {
       const res = await getDashboard();
       setData(res?.data);
     } catch (err: any) {
-      console.error("Dashboard Error:", err);
       if (err.message === "Unauthorized") {
         router.replace("/login");
       }
