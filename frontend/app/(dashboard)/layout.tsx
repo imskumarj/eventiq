@@ -10,14 +10,14 @@ export default function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const { isAuthenticated, isLoading, isInitialized } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/login");
+    if (isInitialized && !isAuthenticated) {
+      router.replace("/login");
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isInitialized, isAuthenticated]);
 
   if (isLoading) {
     return (

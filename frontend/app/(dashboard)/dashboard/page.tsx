@@ -42,12 +42,6 @@ export default function Dashboard() {
     return <div className="p-6">Initializing...</div>;
   }
 
-  useEffect(() => {
-    if (isInitialized && !isAuthenticated) {
-      router.replace("/login");
-    }
-  }, [isInitialized, isAuthenticated]);
-
   async function fetchData() {
     try {
       const res = await getDashboard();
