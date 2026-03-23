@@ -13,6 +13,7 @@ import {
   Activity,
   Zap,
   ChevronLeft,
+  ChevronRight,
   LogOut,
   TrendingUp,
 } from "lucide-react";
@@ -32,7 +33,7 @@ const navItems: NavItem[] = [
   { label: "Events", icon: <Calendar className="w-5 h-5" />, path: "/events", roles: ["admin", "organizer"] },
   { label: "My Events", icon: <Calendar className="w-5 h-5" />, path: "/events", roles: ["sponsor"] },
   { label: "Sponsors", icon: <Users className="w-5 h-5" />, path: "/sponsors", roles: ["admin", "organizer"] },
-  { label: "Analytics Engine", icon: <BarChart3 className="w-5 h-5" />, path: "/analytics", roles: ["admin"] },
+  { label: "Analytics", icon: <BarChart3 className="w-5 h-5" />, path: "/analytics", roles: ["admin"] },
   { label: "ROI Analytics", icon: <TrendingUp className="w-5 h-5" />, path: "/analytics", roles: ["sponsor"] },
   { label: "Reports", icon: <FileText className="w-5 h-5" />, path: "/reports", roles: ["admin", "sponsor", "organizer"] },
   { label: "Data Ingestion", icon: <Database className="w-5 h-5" />, path: "/data-ingestion", roles: ["admin"] },
@@ -52,41 +53,37 @@ export default function AppSidebar() {
   return (
     <motion.aside
       animate={{ width: collapsed ? 72 : 260 }}
-      transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="h-screen sticky top-0 flex flex-col bg-sidebar border-r border-sidebar-border overflow-hidden z-30"
+      transition={{ duration: 0.2 }}
+      className="fixed inset-y-0 left-0 h-screen w-[260px] flex flex-col bg-sidebar border-r border-sidebar-border z-30 overflow-hidden"
     >
-      {/* Logo */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-border">
-        <AnimatePresence>
+      {/* 🔥 HEADER */}
+      <div className="h-16 py-4 flex items-center justify-between px-4 border-b border-sidebar-border gap-2">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl gradient-accent flex items-center justify-center shadow-md">
+            <Zap className="w-4 h-4 text-white" color="white" />
+          </div>
+
           {!collapsed && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex items-center gap-2.5"
-            >
-              <div className="w-8 h-8 rounded-lg gradient-accent flex items-center justify-center flex-shrink-0">
-                <Zap className="w-4 h-4 text-accent-foreground" />
-              </div>
-              <span className="text-lg font-bold text-sidebar-primary-foreground">
-                EventIQ
-              </span>
-            </motion.div>
+            <span className="text-lg font-semibold text-sidebar-primary-foreground">
+              EventIQ
+            </span>
           )}
-        </AnimatePresence>
+        </div>
 
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="w-7 h-7 rounded-md flex items-center justify-center text-sidebar-muted hover:text-sidebar-primary-foreground hover:bg-sidebar-accent transition-colors"
+          className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-sidebar-accent/50 transition"
         >
-          <ChevronLeft
-            className={cn("w-4 h-4 transition-transform", collapsed && "rotate-180")}
-          />
+          {collapsed ? (
+            <ChevronRight className="w-4 h-4" />
+          ) : (
+            <ChevronLeft className="w-4 h-4" />
+          )}
         </button>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+      {/* 🔥 NAV */}
+      <nav className="flex-1 min-h-0 py-4 px-3 space-y-1 overflow-y-auto">
         {filteredItems.map((item) => {
           const isActive = pathname === item.path;
 
@@ -95,41 +92,30 @@ export default function AppSidebar() {
               key={item.label}
               href={item.path}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150",
+                "flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all",
                 isActive
-                  ? "bg-sidebar-accent text-sidebar-primary-foreground"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-primary-foreground"
+                  ? "gradient-accent text-white shadow-sm"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent/50"
               )}
             >
               {item.icon}
 
-              <AnimatePresence>
-                {!collapsed && (
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="whitespace-nowrap"
-                  >
-                    {item.label}
-                  </motion.span>
-                )}
-              </AnimatePresence>
+              {!collapsed && <span>{item.label}</span>}
             </Link>
           );
         })}
       </nav>
 
-      {/* User section */}
-      <div className="p-3 border-t border-sidebar-border">
-        <div className="flex items-center gap-3 px-3 py-2">
-          <div className="w-8 h-8 rounded-full gradient-accent flex items-center justify-center text-xs font-bold text-accent-foreground">
+      {/* 🔥 USER */}
+      <div className="sticky bottom-0 p-3 border-t border-sidebar-border bg-sidebar">
+        <div className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-sidebar-accent transition">
+          <div className="w-8 h-8 rounded-full gradient-accent flex items-center justify-center text-xs font-bold text-white">
             {user?.name?.charAt(0).toUpperCase()}
           </div>
 
           {!collapsed && (
             <>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1">
                 <p className="text-sm font-medium text-sidebar-primary-foreground truncate">
                   {user?.name}
                 </p>
@@ -143,7 +129,7 @@ export default function AppSidebar() {
                   logout();
                   router.push("/login");
                 }}
-                className="text-sidebar-muted hover:text-sidebar-primary-foreground"
+                className="hover:text-white text-sidebar-muted"
               >
                 <LogOut className="w-4 h-4" />
               </button>

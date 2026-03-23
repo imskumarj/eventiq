@@ -10,7 +10,7 @@ import {
   Users,
   DollarSign,
   TrendingUp,
-  Download
+  Download,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -33,14 +33,9 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Dashboard() {
-
   const { isLoading, isAuthenticated, isInitialized } = useAuth();
   const [data, setData] = useState<any>(null);
   const router = useRouter();
-
-  if (!isInitialized) {
-    return <div className="p-6">Initializing...</div>;
-  }
 
   async function fetchData() {
     try {
@@ -65,126 +60,154 @@ export default function Dashboard() {
     }
   }, [isInitialized, isAuthenticated]);
 
-  if (isLoading) return <div className="p-6">Loading session...</div>;
-  if (!data) return <div className="p-6">Loading dashboard...</div>;
+  if (!isInitialized) {
+    return <div className="p-6 text-muted-foreground">Initializing...</div>;
+  }
+
+  if (isLoading) {
+    return <div className="p-6 text-muted-foreground">Loading session...</div>;
+  }
+
+  if (!data) {
+    return <div className="p-6 text-muted-foreground">Loading dashboard...</div>;
+  }
 
   return (
-    <div className="space-y-6 max-w-[1400px]">
+    <div className="space-y-10 max-w-[1600px] mx-auto px-2">
 
-      {/* Header */}
-
-      <motion.div className="flex justify-between">
-
+      {/* 🔥 HEADER */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+      >
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground text-sm">
-            Overview of your event analytics
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Track performance, revenue, and sponsor engagement
           </p>
         </div>
 
-        <Button variant="outline" size="sm">
-          <Download className="w-4 h-4 mr-2" />
-          Export
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2 px-3 py-1.5 bg-red"
+        >
+          <Download className="w-4 h-4" />
+          Export Report
         </Button>
-
       </motion.div>
 
-      {/* KPI */}
+      {/* 🔥 KPI SECTION */}
+      <div className="space-y-4">
+        <h2 className="text-sm font-medium text-muted-foreground">
+          Overview
+        </h2>
 
-      <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <KpiCard
+            title="Total Events"
+            value={data.kpis.totalEvents}
+            change="Live"
+            changeType="neutral"
+            icon={Calendar}
+            delay={0}
+          />
 
-        <KpiCard
-          title="Total Events"
-          value={data.kpis.totalEvents}
-          change="Live"
-          changeType="neutral"
-          icon={Calendar}
-        />
+          <KpiCard
+            title="Total Sponsors"
+            value={data.kpis.totalSponsors}
+            change="Live"
+            changeType="neutral"
+            icon={Users}
+            delay={0.1}
+          />
 
-        <KpiCard
-          title="Total Sponsors"
-          value={data.kpis.totalSponsors}
-          change="Live"
-          changeType="neutral"
-          icon={Users}
-        />
+          <KpiCard
+            title="Total Revenue"
+            value={`$${data.kpis.totalRevenue}`}
+            change="Live"
+            changeType="positive"
+            icon={DollarSign}
+            delay={0.2}
+          />
 
-        <KpiCard
-          title="Total Revenue"
-          value={`$${data.kpis.totalRevenue}`}
-          change="Live"
-          changeType="positive"
-          icon={DollarSign}
-        />
-
-        <KpiCard
-          title="Avg ROI"
-          value={`${data.kpis.avgROI}%`}
-          change="Live"
-          changeType="positive"
-          icon={TrendingUp}
-        />
-
+          <KpiCard
+            title="Avg ROI"
+            value={`${data.kpis.avgROI}%`}
+            change="Live"
+            changeType="positive"
+            icon={TrendingUp}
+            delay={0.3}
+          />
+        </div>
       </div>
 
-      {/* Charts */}
+      {/* 🔥 CHART SECTION */}
+      <div className="space-y-4">
+        <h2 className="text-sm font-medium text-muted-foreground">
+          Analytics
+        </h2>
 
-      <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Revenue Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="card-elevated p-6 space-y-4"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold">Revenue Growth</h3>
+              <span className="text-xs text-muted-foreground">Monthly</span>
+            </div>
 
-        {/* Revenue */}
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={data.revenueData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
 
-        <motion.div className="card-elevated p-6">
+                <Line
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="hsl(262,83%,58%)"
+                  strokeWidth={2.5}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </motion.div>
 
-          <h3 className="text-sm font-semibold mb-4">
-            Revenue Growth
-          </h3>
+          {/* ROI Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="card-elevated p-6 space-y-4"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold">Sponsor ROI</h3>
+              <span className="text-xs text-muted-foreground">Top Sponsors</span>
+            </div>
 
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={data.revenueData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={data.roiData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="sponsor" />
+                <YAxis />
+                <Tooltip />
 
-              <Line
-                type="monotone"
-                dataKey="revenue"
-                stroke="hsl(262,83%,58%)"
-                strokeWidth={2}
-              />
-
-            </LineChart>
-          </ResponsiveContainer>
-
-        </motion.div>
-
-        {/* ROI */}
-
-        <motion.div className="card-elevated p-6">
-
-          <h3 className="text-sm font-semibold mb-4">
-            Sponsor ROI
-          </h3>
-
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={data.roiData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="sponsor" />
-              <YAxis />
-              <Tooltip />
-
-              <Bar
-                dataKey="roi"
-                fill="hsl(199,89%,48%)"
-              />
-
-            </BarChart>
-          </ResponsiveContainer>
-
-        </motion.div>
-
+                <Bar
+                  dataKey="roi"
+                  fill="hsl(199,89%,48%)"
+                  radius={[6, 6, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </motion.div>
+        </div>
       </div>
-
     </div>
   );
 }

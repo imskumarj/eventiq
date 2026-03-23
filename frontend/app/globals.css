@@ -10,7 +10,7 @@
 
 @layer base {
   :root {
-    --background: 220 20% 97%;
+    --background: 220 20% 96%;
     --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
@@ -34,7 +34,7 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
+    --border: 220 13% 88%;
     --input: 220 13% 91%;
     --ring: 262 83% 58%;
 
@@ -136,13 +136,14 @@
 @layer utilities {
 
   .card-elevated {
-    @apply bg-card rounded-xl border border-border;
-    box-shadow: var(--shadow-md);
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    @apply bg-card rounded-2xl border border-border;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s ease;
   }
 
   .card-elevated:hover {
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
   }
 
   .card-interactive {
