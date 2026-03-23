@@ -73,13 +73,13 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-10 max-w-[1600px] mx-auto px-2">
+    <div className="space-y-5 max-w-[1600px] mx-auto my-auto px-2">
 
       {/* 🔥 HEADER */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+        className="flex flex-col md:flex-row md:items-center md:justify-between"
       >
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
@@ -99,114 +99,102 @@ export default function Dashboard() {
       </motion.div>
 
       {/* 🔥 KPI SECTION */}
-      <div className="space-y-4">
-        <h2 className="text-sm font-medium text-muted-foreground">
-          Overview
-        </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <KpiCard
+          title="Total Events"
+          value={data.kpis.totalEvents}
+          change="Live"
+          changeType="neutral"
+          icon={Calendar}
+          delay={0}
+        />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          <KpiCard
-            title="Total Events"
-            value={data.kpis.totalEvents}
-            change="Live"
-            changeType="neutral"
-            icon={Calendar}
-            delay={0}
-          />
+        <KpiCard
+          title="Total Sponsors"
+          value={data.kpis.totalSponsors}
+          change="Live"
+          changeType="neutral"
+          icon={Users}
+          delay={0.1}
+        />
 
-          <KpiCard
-            title="Total Sponsors"
-            value={data.kpis.totalSponsors}
-            change="Live"
-            changeType="neutral"
-            icon={Users}
-            delay={0.1}
-          />
+        <KpiCard
+          title="Total Revenue"
+          value={`$${data.kpis.totalRevenue}`}
+          change="Live"
+          changeType="positive"
+          icon={DollarSign}
+          delay={0.2}
+        />
 
-          <KpiCard
-            title="Total Revenue"
-            value={`$${data.kpis.totalRevenue}`}
-            change="Live"
-            changeType="positive"
-            icon={DollarSign}
-            delay={0.2}
-          />
-
-          <KpiCard
-            title="Avg ROI"
-            value={`${data.kpis.avgROI}%`}
-            change="Live"
-            changeType="positive"
-            icon={TrendingUp}
-            delay={0.3}
-          />
-        </div>
+        <KpiCard
+          title="Avg ROI"
+          value={`${data.kpis.avgROI}%`}
+          change="Live"
+          changeType="positive"
+          icon={TrendingUp}
+          delay={0.3}
+        />
       </div>
 
       {/* 🔥 CHART SECTION */}
-      <div className="space-y-4">
-        <h2 className="text-sm font-medium text-muted-foreground">
-          Analytics
-        </h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Revenue Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card-elevated p-6 space-y-4"
+        >
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold">Revenue Growth</h3>
+            <span className="text-xs text-muted-foreground">Monthly</span>
+          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Revenue Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="card-elevated p-6 space-y-4"
-          >
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold">Revenue Growth</h3>
-              <span className="text-xs text-muted-foreground">Monthly</span>
-            </div>
+          <ResponsiveContainer width="100%" height={270}>
+            <LineChart data={data.revenueData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
 
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={data.revenueData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="revenue"
+                stroke="hsl(262,83%,58%)"
+                strokeWidth={2.5}
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </motion.div>
 
-                <Line
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="hsl(262,83%,58%)"
-                  strokeWidth={2.5}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </motion.div>
+        {/* ROI Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="card-elevated p-6 space-y-4"
+        >
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold">Sponsor ROI</h3>
+            <span className="text-xs text-muted-foreground">Top Sponsors</span>
+          </div>
 
-          {/* ROI Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="card-elevated p-6 space-y-4"
-          >
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold">Sponsor ROI</h3>
-              <span className="text-xs text-muted-foreground">Top Sponsors</span>
-            </div>
+          <ResponsiveContainer width="100%" height={270}>
+            <BarChart data={data.roiData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="sponsor" />
+              <YAxis />
+              <Tooltip />
 
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={data.roiData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="sponsor" />
-                <YAxis />
-                <Tooltip />
-
-                <Bar
-                  dataKey="roi"
-                  fill="hsl(199,89%,48%)"
-                  radius={[6, 6, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </motion.div>
-        </div>
+              <Bar
+                dataKey="roi"
+                fill="hsl(199,89%,48%)"
+                radius={[6, 6, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </motion.div>
       </div>
     </div>
   );
