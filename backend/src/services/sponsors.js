@@ -2,9 +2,34 @@ import prisma from "../config/db.js";
 
 /* ---------------- GET SPONSORS ---------------- */
 
-export async function getSponsors({ search }) {
+export async function getSponsors({ search, user }) {
+
+  /* ---------------- ROLE FILTER ---------------- */
+
+  let where = {};
+
+  if (user.role === "organizer") {
+    where = {
+      event: {
+        organizerId: user.id
+      }
+    };
+  }
+
+  if (user.role === "sponsor") {
+    where = {
+      sponsor: {
+        userId: user.id
+      }
+    };
+  }
+
+  // admin → no filter (sees all)
+
+  /* ---------------- FETCH ---------------- */
 
   const sponsorships = await prisma.sponsorship.findMany({
+    where,
     include: {
       sponsor: true,
       event: true
@@ -13,6 +38,8 @@ export async function getSponsors({ search }) {
       id: "desc"
     }
   });
+
+  /* ---------------- FORMAT ---------------- */
 
   let data = sponsorships.map((s) => {
 
@@ -39,7 +66,7 @@ export async function getSponsors({ search }) {
     };
   });
 
-  /* -------- Search Filter -------- */
+  /* ---------------- SEARCH ---------------- */
 
   if (search) {
     data = data.filter(
@@ -51,8 +78,6 @@ export async function getSponsors({ search }) {
 
   return data;
 }
-
-/* ---------------- CREATE SPONSOR ---------------- */
 
 /* ---------------- CREATE SPONSOR ---------------- */
 

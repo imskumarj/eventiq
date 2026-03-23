@@ -11,7 +11,10 @@ export async function getSponsorsController(req, res) {
 
     const { search } = req.query;
 
-    const data = await getSponsors({ search });
+    const data = await getSponsors({
+      search,
+      user: req.user   // ✅ IMPORTANT
+    });
 
     res.json({
       success: true,
