@@ -37,15 +37,6 @@ export default function TopNavbar() {
             />
             
           </div>
-
-          {searchOpen && (
-            <div className="absolute top-12 left-0 right-0 bg-card rounded-xl border border-border shadow-lg p-3">
-              <p className="text-xs text-muted-foreground">
-                Press <kbd className="px-1 py-0.5 bg-muted rounded">⌘K</kbd> for quick search
-              </p>
-            </div>
-          )}
-
         </div>
       </div>
 

@@ -129,11 +129,11 @@ export default function AppSidebar() {
           {!collapsed && (
             <>
               <div className="flex-1">
-                <p className="text-sm font-medium text-sidebar-primary-foreground truncate">
+                <p className="text-xs font-medium text-sidebar-primary-foreground truncate">
                   {user?.name}
                 </p>
-                <p className="text-xs text-sidebar-muted capitalize">
-                  {user?.role}
+                <p className="text-xs text-black/50 capitalize" color="black/50">
+                  {user?.role.toUpperCase()}
                 </p>
               </div>
 
