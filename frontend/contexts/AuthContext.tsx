@@ -77,7 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const res = await registerUser({ email, password, name, role });
 
-      const { user, token } = res!.data;
+      const { user, token } = res!.data.data;
 
       setUser(user);
 
@@ -94,7 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const res = await loginUser({ email, password });
 
-      const { user, token } = res.data;
+      const { user, token } = res.data.data;
 
       console.log("TOKEN SAVED:", token); // 👈 ADD THIS
 
