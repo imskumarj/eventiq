@@ -16,7 +16,8 @@ export async function apiRequest(
   const isAuthRoute = endpoint.startsWith("/auth");
 
   if (!token && !isAuthRoute) {
-    throw new Error("Unauthorized");
+    // let backend handle it instead
+    console.warn("No token found");
   }
 
   const res = await fetch(`${API_BASE}${endpoint}`, {

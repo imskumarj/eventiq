@@ -44,20 +44,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const storedUser = localStorage.getItem("eventiq_user");
       const token = localStorage.getItem("eventiq_token");
 
-      if (
-        storedUser &&
-        storedUser !== "undefined" &&
-        storedUser !== "null" &&
-        token
-      ) {
-        setUser(JSON.parse(storedUser));
+      // ✅ KEY FIX: token is the source of truth
+      if (token) {
+        if (
+          storedUser &&
+          storedUser !== "undefined" &&
+          storedUser !== "null"
+        ) {
+          setUser(JSON.parse(storedUser));
+        } else {
+          // fallback → token exists but user missing
+          setUser({} as User); // temporary auth state
+        }
       }
     } catch {
       localStorage.removeItem("eventiq_user");
       localStorage.removeItem("eventiq_token");
     } finally {
       setIsLoading(false);
-      setIsInitialized(true); // ✅ IMPORTANT
+      setIsInitialized(true);
     }
   }, []);
 
@@ -91,13 +96,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const { user, token } = res.data;
 
-      // ✅ SAVE FIRST
+      console.log("TOKEN SAVED:", token); // 👈 ADD THIS
+
       localStorage.setItem("eventiq_user", JSON.stringify(user));
       localStorage.setItem("eventiq_token", token);
 
-      // ✅ THEN SET STATE
       setUser(user);
-
     } finally {
       setIsLoading(false);
     }

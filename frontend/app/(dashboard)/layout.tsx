@@ -26,8 +26,10 @@ export default function Layout({
       </div>
     );
   }
-
-  if (!isAuthenticated) return null;
+  
+  if (!isAuthenticated) {
+    return <div className="p-6">Redirecting...</div>;
+  }
 
   return <DashboardLayout>{children}</DashboardLayout>;
 }

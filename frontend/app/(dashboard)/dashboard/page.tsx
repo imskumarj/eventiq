@@ -48,26 +48,24 @@ export default function Dashboard() {
       setData(res?.data);
     } catch (err: any) {
       console.error("Dashboard Error:", err);
-      if (err.message === "Unauthorized" && isAuthenticated) {
-        router.push("/login");
-      } 
+      if (err.message === "Unauthorized") {
+        router.replace("/login");
+      }
     }
   }
 
   useEffect(() => {
-    if (isInitialized && isAuthenticated) {
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("eventiq_token")
+        : null;
+
+    if (isInitialized && isAuthenticated && token) {
       fetchData();
     }
   }, [isInitialized, isAuthenticated]);
 
   if (isLoading) return <div className="p-6">Loading session...</div>;
-
-  // ✅ Wait until token exists
-  const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem("eventiq_token")
-      : null;
-
   if (!data) return <div className="p-6">Loading dashboard...</div>;
 
   return (
