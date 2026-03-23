@@ -91,7 +91,7 @@ export default function Dashboard() {
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-2 px-3 py-1.5 bg-red"
+          className="flex items-center gap-2 px-3 py-2.5 bg-color-foreground/10 hover:bg-foreground/20 transition-colors"
         >
           <Download className="w-4 h-4" />
           Export Report
