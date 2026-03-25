@@ -59,6 +59,72 @@ export default function Dashboard() {
     }
   }, [isInitialized, isAuthenticated]);
 
+  function downloadCsvFile(filename: string, csvContent: string) {
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    link.style.display = "none";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  function formatCell(value: any) {
+    if (value === null || value === undefined) return "";
+
+    const escaped = String(value).replace(/"/g, '""');
+    return `"${escaped}"`;
+  }
+
+  function generateDashboardCsv(data: any) {
+    const rows: string[][] = [];
+
+    rows.push(["Dashboard Export", "EventIQ"]);
+    rows.push(["Generated At", new Date().toLocaleString()]);
+    rows.push([]);
+
+    rows.push(["KPI", "Value"]);
+    rows.push(["Total Events", data.kpis.totalEvents]);
+    rows.push(["Total Sponsors", data.kpis.totalSponsors]);
+    rows.push(["Total Revenue", `₹${data.kpis.totalRevenue}`]);
+    rows.push(["Avg ROI", `${data.kpis.avgROI}`, "%"]);
+    rows.push([]);
+
+    rows.push(["Revenue Growth (Monthly)"]);
+    rows.push(["Month", "Revenue"]);
+    data.revenueData.forEach((row: any) => {
+      rows.push([row.month, row.revenue]);
+    });
+    rows.push([]);
+
+    rows.push(["Sponsor ROI (Top Sponsors)"]);
+    rows.push(["Sponsor", "ROI"]);
+    data.roiData.forEach((row: any) => {
+      rows.push([row.sponsor, row.roi]);
+    });
+
+    return rows
+      .map((row) => row.map(formatCell).join(","))
+      .join("\n");
+  }
+
+  function handleExportReport() {
+    if (!data) {
+      return;
+    }
+
+    const csv = generateDashboardCsv(data);
+    const filename = `eventiq_dashboard_report_${new Date()
+      .toISOString()
+      .slice(0, 10)}.csv`;
+    downloadCsvFile(filename, csv);
+  }
+
   if (!isInitialized) {
     return <div className="p-6 text-muted-foreground">Initializing...</div>;
   }
@@ -91,6 +157,7 @@ export default function Dashboard() {
           variant="outline"
           size="sm"
           className="flex items-center gap-2 px-3 py-2.5 bg-color-foreground/10 hover:bg-foreground/20 transition-colors"
+          onClick={handleExportReport}
         >
           <Download className="w-4 h-4" />
           Export Report
