@@ -61,7 +61,7 @@ model Sponsorship {
   boothVisits Int
   leads       Int
 
-  event   Event   @relation(fields: [eventId], references: [id])
+  event   Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
   sponsor Sponsor @relation(fields: [sponsorId], references: [id])
 }
 
