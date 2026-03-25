@@ -74,7 +74,7 @@ export default function Analytics() {
       try {
         const res = await getAnalyticsDashboard();
 
-        const data = res.data;
+        const data = res.data.data;
 
         setRoiRanking(data.roiRanking);
         setTopEvents(data.topEvents);
@@ -108,7 +108,7 @@ export default function Analytics() {
   }
 
   return (
-    <div className="space-y-6 max-w-[1400px]">
+    <div className="space-y-5 max-w-[1400px]">
 
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <h1 className="text-2xl font-bold">Analytics Engine</h1>
@@ -119,7 +119,7 @@ export default function Analytics() {
 
       {/* ---------------- TABLES ---------------- */}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
 
         {/* ROI Ranking */}
 
@@ -137,50 +137,52 @@ export default function Analytics() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">
-                <TableHead className="w-16">#</TableHead>
-                <TableHead>Sponsor</TableHead>
-                <TableHead className="text-right">ROI</TableHead>
-                <TableHead className="text-right">Events</TableHead>
-                <TableHead className="text-center">Trend</TableHead>
+                <TableHead className="w-16 text-center py-2">#</TableHead>
+                <TableHead className="text-left py-2">Sponsor</TableHead>
+                <TableHead className="text-right py-2">ROI</TableHead>
+                <TableHead className="text-right py-2">Events</TableHead>
+                <TableHead className="text-center py-2">Trend</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
               {roiRanking.map((r) => (
                 <TableRow key={r.rank}>
-                  <TableCell className="font-bold text-accent">
+                  <TableCell className="font-bold text-accent text-center py-2">
                     {r.rank}
                   </TableCell>
 
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium text-left py-2 pl-4">
                     {r.sponsor}
                   </TableCell>
 
-                  <TableCell className="text-right font-semibold text-success">
+                  <TableCell className="text-right font-semibold text-success pr-4 py-2">
                     {r.roi}%
                   </TableCell>
 
-                  <TableCell className="text-right">
+                  <TableCell className="text-right pr-9 py-2">
                     {r.events}
                   </TableCell>
 
-                  <TableCell className="text-center">
-                    <Badge
-                      variant="secondary"
-                      className={
-                        r.trend === "up"
-                          ? "bg-success/10 text-success"
+                  <TableCell className="text-center py-2">
+                    <div className="flex justify-center">
+                      <Badge
+                        variant="secondary"
+                        className={`rounded-full w-6 h-6 flex items-center justify-center p-0 ${
+                          r.trend === "up"
+                            ? "bg-green-500 text-white"
+                            : r.trend === "down"
+                            ? "bg-red-500 text-white"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {r.trend === "up"
+                          ? "↑"
                           : r.trend === "down"
-                          ? "bg-destructive/10 text-destructive"
-                          : "bg-muted text-muted-foreground"
-                      }
-                    >
-                      {r.trend === "up"
-                        ? "↑"
-                        : r.trend === "down"
-                        ? "↓"
-                        : "→"}
-                    </Badge>
+                          ? "↓"
+                          : "→"}
+                      </Badge>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -205,21 +207,21 @@ export default function Analytics() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">
-                <TableHead>Event</TableHead>
-                <TableHead className="text-right">Score</TableHead>
-                <TableHead className="text-right">Revenue</TableHead>
-                <TableHead className="text-right">Attendees</TableHead>
+                <TableHead className="text-left py-2">Event</TableHead>
+                <TableHead className="text-center py-2">Score</TableHead>
+                <TableHead className="text-right py-2 pr-10">Revenue</TableHead>
+                <TableHead className="text-right py-2">Attendees</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
               {topEvents.map((e) => (
                 <TableRow key={e.name}>
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium pl-4 text-left py-2">
                     {e.name}
                   </TableCell>
 
-                  <TableCell className="text-right">
+                  <TableCell className="text-center py-2">
                     <Badge
                       variant="secondary"
                       className="bg-accent/10 text-accent"
@@ -228,11 +230,11 @@ export default function Analytics() {
                     </Badge>
                   </TableCell>
 
-                  <TableCell className="text-right font-medium">
-                    ${(e.revenue / 1000).toFixed(0)}K
+                  <TableCell className="text-center font-medium pl-14 py-2">
+                    ₹{(e.revenue / 1000).toFixed(0)}K
                   </TableCell>
 
-                  <TableCell className="text-right">
+                  <TableCell className="text-right pr-10 py-2">
                     {e.attendees.toLocaleString()}
                   </TableCell>
                 </TableRow>
@@ -265,7 +267,7 @@ export default function Analytics() {
 
               <XAxis dataKey="quarter" />
 
-              <YAxis tickFormatter={(v: any) => `$${v / 1000}k`} />
+              <YAxis tickFormatter={(v: any) => `₹${v / 1000}k`} />
 
               <Tooltip />
 
@@ -310,7 +312,7 @@ export default function Analytics() {
 
               <YAxis
                 dataKey="revenue"
-                tickFormatter={(v: any) => `$${v}k`}
+                tickFormatter={(v: any) => `₹${v}k`}
               />
 
               <ZAxis dataKey="z" range={[60, 400]} />

@@ -1,9 +1,9 @@
-import * as analyticsService from "../services/analytics.js";
+import * as analyticsService from '../services/analytics.js';
 
 export async function getAnalyticsDashboard(req, res, next) {
   try {
 
-    const data = await analyticsService.getDashboardAnalytics();
+    const data = await analyticsService.getDashboardAnalytics(req.user);
 
     res.json({
       success: true,

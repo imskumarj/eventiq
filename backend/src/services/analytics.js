@@ -1,44 +1,97 @@
 import prisma from "../config/db.js";
 
-export async function getDashboardAnalytics() {
+export async function getDashboardAnalytics(user) {
 
-  const sponsors = await prisma.sponsor.findMany({
+  const isAdmin = user.role === "admin";
+  const isOrganizer = user.role === "organizer";
+  const isSponsor = user.role === "sponsor";
+
+  /* ---------------- FILTER EVENTS ---------------- */
+
+  let eventFilter = {};
+
+  if (isOrganizer) {
+    eventFilter.organizerId = user.id;
+  }
+
+  if (isSponsor) {
+    const sponsor = await prisma.sponsor.findUnique({
+      where: { userId: user.id }
+    });
+
+    const sponsorships = await prisma.sponsorship.findMany({
+      where: { sponsorId: sponsor?.id },
+      select: { eventId: true }
+    });
+
+    const eventIds = sponsorships.map(s => s.eventId);
+
+    eventFilter.id = { in: eventIds };
+  }
+
+  const events = await prisma.event.findMany({
+    where: eventFilter
+  });
+
+  /* ---------------- FILTER SPONSORSHIPS ---------------- */
+
+  let sponsorshipFilter = {};
+
+  if (isOrganizer) {
+    sponsorshipFilter.event = {
+      organizerId: user.id
+    };
+  }
+
+  if (isSponsor) {
+    const sponsor = await prisma.sponsor.findUnique({
+      where: { userId: user.id }
+    });
+
+    sponsorshipFilter.sponsorId = sponsor?.id;
+  }
+
+  const sponsorships = await prisma.sponsorship.findMany({
+    where: sponsorshipFilter,
     include: {
-      events: {
-        include: {
-          event: true
-        }
-      }
+      sponsor: true,
+      event: true
     }
   });
 
-  const events = await prisma.event.findMany();
+  /* ---------------- ROI RANKING ---------------- */
 
-  /* ---------------- ROI Ranking ---------------- */
+  const sponsorMap = {};
 
-  const roiRanking = sponsors.map((s) => {
+  sponsorships.forEach((s) => {
+    if (!sponsorMap[s.sponsorId]) {
+      sponsorMap[s.sponsorId] = {
+        sponsor: s.sponsor.name,
+        investment: 0,
+        leads: 0,
+        events: new Set()
+      };
+    }
 
-    const totalInvestment = s.events.reduce(
-      (sum, e) => sum + e.investment,
-      0
-    );
+    sponsorMap[s.sponsorId].investment += s.investment;
+    sponsorMap[s.sponsorId].leads += s.leads;
+    sponsorMap[s.sponsorId].events.add(s.eventId);
+  });
 
-    const totalRevenue = s.events.reduce(
-      (sum, e) => sum + e.event.revenue,
-      0
-    );
+  const roiRanking = Object.values(sponsorMap)
+    .map((s) => {
+      const roi =
+        s.investment > 0
+          ? ((s.leads * 1000) / s.investment) * 100
+          : 0;
 
-    const roi = totalInvestment === 0
-      ? 0
-      : ((totalRevenue - totalInvestment) / totalInvestment) * 100;
-
-    return {
-      sponsor: s.name,
-      roi: Math.round(roi),
-      events: s.events.length
-    };
-
-  }).sort((a, b) => b.roi - a.roi)
+      return {
+        sponsor: s.sponsor,
+        roi: Math.round(roi),
+        events: s.events.size
+      };
+    })
+    .sort((a, b) => b.roi - a.roi)
     .slice(0, 5)
     .map((s, index) => ({
       rank: index + 1,
@@ -46,8 +99,7 @@ export async function getDashboardAnalytics() {
       trend: "up"
     }));
 
-
-  /* ---------------- Top Events ---------------- */
+  /* ---------------- TOP EVENTS ---------------- */
 
   const topEvents = events
     .sort((a, b) => b.engagement - a.engagement)
@@ -59,8 +111,7 @@ export async function getDashboardAnalytics() {
       attendees: e.attendees
     }));
 
-
-  /* ---------------- Scatter Data ---------------- */
+  /* ---------------- SCATTER ---------------- */
 
   const scatterData = events.map(e => ({
     engagement: e.engagement,
@@ -68,16 +119,30 @@ export async function getDashboardAnalytics() {
     z: e.attendees
   }));
 
+  /* ---------------- YOY (DYNAMIC VERSION) ---------------- */
 
-  /* ---------------- YoY Data (example logic) ---------------- */
+  const yoyMap = {};
 
-  const yoyData = [
-    { quarter: "Q1", thisYear: 155000, lastYear: 120000 },
-    { quarter: "Q2", thisYear: 198000, lastYear: 155000 },
-    { quarter: "Q3", thisYear: 237000, lastYear: 180000 },
-    { quarter: "Q4", thisYear: 285000, lastYear: 210000 }
-  ];
+  events.forEach((e) => {
+    const date = new Date(e.date);
+    const year = date.getFullYear();
+    const quarter = `Q${Math.floor(date.getMonth() / 3) + 1}`;
 
+    if (!yoyMap[quarter]) {
+      yoyMap[quarter] = { thisYear: 0, lastYear: 0 };
+    }
+
+    if (year === new Date().getFullYear()) {
+      yoyMap[quarter].thisYear += e.revenue;
+    } else {
+      yoyMap[quarter].lastYear += e.revenue;
+    }
+  });
+
+  const yoyData = Object.entries(yoyMap).map(([quarter, val]) => ({
+    quarter,
+    ...val
+  }));
 
   return {
     roiRanking,
@@ -85,5 +150,4 @@ export async function getDashboardAnalytics() {
     scatterData,
     yoyData
   };
-
 }
