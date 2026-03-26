@@ -1,10 +1,13 @@
 import { processCsv, getImportLogs } from "../services/ingestion.js";
 
+/* ---------------- UPLOAD ---------------- */
+
 export async function uploadCsv(req, res) {
   try {
 
     if (!req.file) {
       return res.status(400).json({
+        success: false,
         message: "No file uploaded"
       });
     }
@@ -26,26 +29,31 @@ export async function uploadCsv(req, res) {
     console.error(error);
 
     res.status(500).json({
+      success: false,
       message: "Failed to process CSV"
     });
 
   }
 }
 
-export async function getImports(req, res) {
+/* ---------------- GET IMPORTS ---------------- */
 
+export async function getImports(req, res) {
   try {
 
     const logs = await getImportLogs();
 
-    res.json(logs);
+    res.json({
+      success: true,
+      data: logs
+    });
 
-  } catch (error) {
+  } catch {
 
     res.status(500).json({
+      success: false,
       message: "Failed to fetch imports"
     });
 
   }
-
 }

@@ -2,10 +2,21 @@ import fs from "fs";
 import csv from "csv-parser";
 import prisma from "../config/db.js";
 
+/* ---------------- VALIDATION ---------------- */
+
+function validateRow(row) {
+  if (!row.name) return "Missing name";
+  if (!row.date || isNaN(new Date(row.date))) return "Invalid date";
+  return null;
+}
+
+/* ---------------- MAIN PROCESS ---------------- */
+
 export async function processCsv(filePath, filename, userId) {
   return new Promise((resolve, reject) => {
 
     const rows = [];
+    const errors = [];
 
     fs.createReadStream(filePath)
       .pipe(csv())
@@ -14,33 +25,70 @@ export async function processCsv(filePath, filename, userId) {
       .on("end", async () => {
         try {
 
-          const validRows = rows
-            .filter(r => r.name && r.date)
-            .map(r => ({
-              name: r.name,
-              location: r.location || "",
-              date: new Date(r.date),
-              attendees: Number(r.attendees || 0),
-              revenue: Number(r.revenue || 0),
+          const validData = [];
+
+          for (const row of rows) {
+
+            const error = validateRow(row);
+
+            if (error) {
+              errors.push({
+                row,
+                error
+              });
+              continue;
+            }
+
+            /* ---- DUPLICATE CHECK ---- */
+            const exists = await prisma.event.findFirst({
+              where: {
+                name: row.name,
+                date: new Date(row.date),
+                organizerId: userId
+              }
+            });
+
+            if (exists) {
+              errors.push({
+                row,
+                error: "Duplicate event"
+              });
+              continue;
+            }
+
+            validData.push({
+              name: row.name,
+              location: row.location || "",
+              date: new Date(row.date),
+              attendees: Number(row.attendees || 0),
+              revenue: Number(row.revenue || 0),
               engagement: 0,
               organizerId: userId
-            }));
-
-          if (validRows.length > 0) {
-            await prisma.event.createMany({
-              data: validRows
             });
           }
 
+          /* ---- BULK INSERT ---- */
+          if (validData.length > 0) {
+            await prisma.event.createMany({
+              data: validData
+            });
+          }
+
+          /* ---- LOG ---- */
           const log = await prisma.importLog.create({
             data: {
               filename,
-              rows: validRows.length,
-              status: "success"
+              rows: validData.length,
+              status: errors.length > 0 ? "partial" : "success"
             }
           });
 
-          resolve(log);
+          resolve({
+            log,
+            inserted: validData.length,
+            failed: errors.length,
+            errors: errors.slice(0, 10) // limit response
+          });
 
         } catch (error) {
 
@@ -55,7 +103,7 @@ export async function processCsv(filePath, filename, userId) {
           reject(error);
 
         } finally {
-          fs.unlink(filePath, () => {}); // ✅ delete file
+          fs.unlink(filePath, () => {});
         }
 
       })
@@ -65,13 +113,11 @@ export async function processCsv(filePath, filename, userId) {
   });
 }
 
-export async function getImportLogs() {
+/* ---------------- GET IMPORT LOGS ---------------- */
 
+export async function getImportLogs() {
   return prisma.importLog.findMany({
-    orderBy: {
-      createdAt: "desc"
-    },
+    orderBy: { createdAt: "desc" },
     take: 20
   });
-
 }

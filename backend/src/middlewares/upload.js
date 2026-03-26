@@ -13,12 +13,16 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype !== "text/csv") {
-    return cb(new Error("Only CSV files allowed"), false);
-  }
+    const allowed =
+      file.mimetype === "text/csv" ||
+      file.originalname.endsWith(".csv");
 
-  cb(null, true);
-};
+    if (!allowed) {
+      return cb(new Error("Only CSV files allowed"), false);
+    }
+
+    cb(null, true);
+  };
 
 export const upload = multer({
   storage,
