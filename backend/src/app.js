@@ -80,6 +80,8 @@ app.use("/api/reports", reportsRoutes);
 app.use("/api/system-metrics", systemMetricsRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
+app.use("/reports", express.static("reports"));
+
 /*
  404 HANDLER
 */

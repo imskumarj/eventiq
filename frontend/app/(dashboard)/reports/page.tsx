@@ -94,9 +94,7 @@ export default function Reports() {
   async function handleDownload(id: string) {
     try {
       const res = await downloadReport(id);
-
-      // Assuming backend sends file URL
-      window.open(res.url, "_blank");
+      window.open(res.data.url, "_blank"); // ✅ now works
     } catch {
       console.error("Download failed");
     }
@@ -147,7 +145,7 @@ export default function Reports() {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full"
+                className="w-full py-2"
                 onClick={() => handleGenerate(report.type)}
                 disabled={loading}
               >
@@ -233,7 +231,11 @@ export default function Reports() {
                   {r.format}
                 </Badge>
 
-                <Button variant="ghost" size="sm">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => window.open(r.fileUrl, "_blank")}
+                >
                   <Eye className="w-4 h-4" />
                 </Button>
 

@@ -3,9 +3,27 @@ import { generateReportFile } from "../utils/reportGenerator.js";
 
 /* -------- GENERATE REPORT -------- */
 
-export async function generateReport(type, format) {
+export async function generateReport(type, format, user) {
 
-  const filePath = await generateReportFile(type, format);
+  let data = {};
+
+  if (type === "roi") {
+    data = await prisma.sponsorship.findMany({
+      include: { sponsor: true, event: true }
+    });
+  }
+
+  if (type === "event") {
+    data = await prisma.event.findMany();
+  }
+
+  if (type === "sponsor") {
+    data = await prisma.sponsor.findMany({
+      include: { sponsorships: true }
+    });
+  }
+
+  const filePath = await generateReportFile(type, format, data);
 
   const report = await prisma.report.create({
     data: {
@@ -13,6 +31,7 @@ export async function generateReport(type, format) {
       type,
       format,
       fileUrl: filePath,
+      userId: user.id // 🔥 IMPORTANT
     },
   });
 
@@ -21,15 +40,22 @@ export async function generateReport(type, format) {
 
 /* -------- GET REPORTS -------- */
 
-export async function getReports() {
+export async function getReports(user) {
+
+  if (user.role === "admin") {
+    return prisma.report.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 20
+    });
+  }
 
   return prisma.report.findMany({
-    orderBy: {
-      createdAt: "desc",
+    where: {
+      userId: user.id // 👈 IMPORTANT (we’ll add this field)
     },
-    take: 20,
+    orderBy: { createdAt: "desc" },
+    take: 20
   });
-
 }
 
 /* -------- GET SINGLE REPORT -------- */
