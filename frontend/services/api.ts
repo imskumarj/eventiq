@@ -10,16 +10,17 @@ export async function apiRequest(
       ? localStorage.getItem("eventiq_token")
       : null;
 
-  // ✅ AUTH GUARD (skip for auth routes)
-  const isAuthRoute = endpoint.startsWith("/auth");
+  const isFormData = options.body instanceof FormData;
 
   const res = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
 
     headers: {
-      "Content-Type": "application/json",
+      // ✅ ONLY set JSON header if NOT FormData
+      ...(!isFormData && {
+        "Content-Type": "application/json",
+      }),
 
-      // ✅ Attach JWT only if exists
       ...(token && {
         Authorization: `Bearer ${token}`,
       }),
@@ -36,9 +37,7 @@ export async function apiRequest(
     data = null;
   }
 
-  /* ✅ HANDLE 401 FROM BACKEND */
   if (res.status === 401) {
-    // optional cleanup (recommended)
     if (typeof window !== "undefined") {
       localStorage.removeItem("eventiq_token");
       localStorage.removeItem("eventiq_user");

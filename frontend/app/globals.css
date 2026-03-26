@@ -40,8 +40,8 @@
 
     --radius: 0.75rem;
 
-    --sidebar-background: 222 47% 11%;
-    --sidebar-foreground: 220 20% 80%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 47% 11%;
     --sidebar-primary: 262 83% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 222 40% 16%;
@@ -167,6 +167,18 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  .bg-sidebar {
+    background-color: hsl(var(--sidebar-background)) !important;
+  }
+
+  .text-sidebar-foreground {
+    color: hsl(var(--sidebar-foreground));
+  }
+
+  .border-sidebar-border {
+    border-color: hsl(var(--sidebar-border));
   }
 
   .glass {
