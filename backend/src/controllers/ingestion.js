@@ -1,7 +1,6 @@
 import { processCsv, getImportLogs } from "../services/ingestion.js";
 
 export async function uploadCsv(req, res) {
-
   try {
 
     if (!req.file) {
@@ -12,10 +11,12 @@ export async function uploadCsv(req, res) {
 
     const result = await processCsv(
       req.file.path,
-      req.file.originalname
+      req.file.originalname,
+      req.user.id
     );
 
     res.json({
+      success: true,
       message: "File processed successfully",
       data: result
     });
@@ -29,7 +30,6 @@ export async function uploadCsv(req, res) {
     });
 
   }
-
 }
 
 export async function getImports(req, res) {

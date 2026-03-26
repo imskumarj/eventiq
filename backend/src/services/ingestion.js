@@ -2,45 +2,40 @@ import fs from "fs";
 import csv from "csv-parser";
 import prisma from "../config/db.js";
 
-export async function processCsv(filePath, filename) {
+export async function processCsv(filePath, filename, userId) {
   return new Promise((resolve, reject) => {
 
     const rows = [];
 
     fs.createReadStream(filePath)
       .pipe(csv())
-      .on("data", (data) => {
-        rows.push(data);
-      })
+      .on("data", (data) => rows.push(data))
 
       .on("end", async () => {
         try {
 
-          const rowCount = rows.length;
+          const validRows = rows
+            .filter(r => r.name && r.date)
+            .map(r => ({
+              name: r.name,
+              location: r.location || "",
+              date: new Date(r.date),
+              attendees: Number(r.attendees || 0),
+              revenue: Number(r.revenue || 0),
+              engagement: 0,
+              organizerId: userId
+            }));
 
-          // Example: insert events if columns exist
-          for (const row of rows) {
-
-            if (row.name && row.date) {
-
-              await prisma.event.create({
-                data: {
-                  name: row.name,
-                  location: row.location || "",
-                  date: new Date(row.date),
-                  attendees: Number(row.attendees || 0),
-                  revenue: Number(row.revenue || 0)
-                }
-              });
-
-            }
-
+          if (validRows.length > 0) {
+            await prisma.event.createMany({
+              data: validRows
+            });
           }
 
           const log = await prisma.importLog.create({
             data: {
               filename,
-              rows: rowCount,
+              rows: validRows.length,
               status: "success"
             }
           });
@@ -59,6 +54,8 @@ export async function processCsv(filePath, filename) {
 
           reject(error);
 
+        } finally {
+          fs.unlink(filePath, () => {}); // ✅ delete file
         }
 
       })

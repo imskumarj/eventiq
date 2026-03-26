@@ -23,7 +23,7 @@ export default function DataIngestion() {
   const fetchImports = async () => {
     try {
       const res = await getImports();
-      setImports(res.data);
+      setImports(res.data.data || res.data);
     } catch (err) {
       console.error("Failed to load imports");
     }
@@ -139,7 +139,7 @@ export default function DataIngestion() {
 
         {/* Options */}
 
-        <div className="space-y-4">
+        <div className="space-y-6">
 
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -157,7 +157,7 @@ export default function DataIngestion() {
             <Button
               variant="outline"
               size="sm"
-              className="w-full"
+              className="w-full py-2"
             >
               Open Form
             </Button>
@@ -182,7 +182,7 @@ export default function DataIngestion() {
             <Button
               variant="outline"
               size="sm"
-              className="w-full"
+              className="w-full py-2"
             >
               Configure API
             </Button>

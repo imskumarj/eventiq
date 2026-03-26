@@ -75,7 +75,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/events", eventsRoutes);
 app.use("/api/sponsors", sponsorsRoutes);
 app.use("/api/analytics", analyticsRoutes);
-app.use("/api/ingestion", ingestionRoutes);
+app.use("/api/data-ingestion", ingestionRoutes);
 app.use("/api/reports", reportsRoutes);
 app.use("/api/system-metrics", systemMetricsRoutes);
 app.use("/api/dashboard", dashboardRoutes);
