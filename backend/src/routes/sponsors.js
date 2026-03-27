@@ -2,7 +2,8 @@ import express from "express";
 
 import {
   getSponsorsController,
-  createSponsorController
+  createSponsorController,
+  updateLeads
 } from "../controllers/sponsors.js";
 
 import { authenticate } from "../middlewares/auth.js";
@@ -14,5 +15,7 @@ const router = express.Router();
 router.get("/", authenticate, getSponsorsController);
 
 router.post("/", authenticate, createSponsorController);
+
+router.patch("/:id/leads", authenticate, updateLeads);
 
 export default router;

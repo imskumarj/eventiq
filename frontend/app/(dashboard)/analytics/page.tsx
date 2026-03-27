@@ -14,6 +14,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
   ZAxis,
 } from "recharts";
@@ -269,16 +270,25 @@ export default function Analytics() {
 
               <YAxis tickFormatter={(v: any) => `₹${v / 1000}k`} />
 
-              <Tooltip />
+              <Tooltip
+                formatter={(value: any, name: any) => {
+                  const key = String(name || "");
+                  const label = key === "lastYear" ? "Last Year" : key === "thisYear" ? "This Year" : key;
+                  return [value, label];
+                }}
+              />
+              <Legend />
 
               <Bar
                 dataKey="lastYear"
-                fill="hsl(220, 13%, 85%)"
+                name="Last Year"
+                fill="hsl(271, 100%, 69%)"
                 radius={[4, 4, 0, 0]}
               />
 
               <Bar
                 dataKey="thisYear"
+                name="This Year"
                 fill="hsl(262, 83%, 58%)"
                 radius={[4, 4, 0, 0]}
               />

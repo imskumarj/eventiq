@@ -55,7 +55,7 @@ export default function AppSidebar() {
     <motion.aside
       animate={{ width: collapsed ? 80 : 260 }}
       transition={{ duration: 0.2 }}
-      className="fixed inset-y-0 left-0 h-screen flex flex-col bg-sidebar border-r border-sidebar-border z-30 overflow-hidden"
+      className="sticky top-0 h-screen shrink-0 flex flex-col bg-sidebar border-r border-sidebar-border z-30 overflow-hidden"
     >
       {/* 🔥 HEADER */}
       <div className="h-16 py-4 flex items-center justify-between px-4 border-b border-sidebar-border gap-2">

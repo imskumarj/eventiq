@@ -21,3 +21,10 @@ export async function createSponsor(data: {
     throw new Error(err.message || "Failed to create sponsor");
   }
 }
+
+export async function updateLeads(id: string, data: any) {
+  return apiRequest(`/sponsors/${id}/leads`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}

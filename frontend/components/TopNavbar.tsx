@@ -18,8 +18,7 @@ export default function TopNavbar() {
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
-    <header className="h-16 border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-20 flex items-center justify-between px-6 mt-4">
-
+    <header className="h-16 border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-20 flex items-center justify-between px-6 py-3">
       {/* 🔍 SEARCH */}
       <div className="flex items-center gap-3 flex-1">
         <div className="relative max-w-lg w-full">

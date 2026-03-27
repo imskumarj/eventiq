@@ -249,7 +249,7 @@ export default function Events() {
               <TableHead className="py-4 bg-muted text-center">Event ID</TableHead>
               <TableHead className="py-4 bg-muted">Event</TableHead>
               <TableHead className="py-4 bg-muted">Date</TableHead>
-              <TableHead className="py-4 bg-muted">Location</TableHead>
+              <TableHead className="py-4 bg-muted pl-5">Location</TableHead>
               <TableHead className="text-right py-4 bg-muted">Attendees</TableHead>
               <TableHead className="text-right py-4 bg-muted">Revenue</TableHead>
               <TableHead className="text-center py-4 bg-muted">Engagement</TableHead>
@@ -280,30 +280,30 @@ export default function Events() {
                   </div>
                 </TableCell>
 
-                <TableCell className="font-medium text-center py-4">
+                <TableCell className="font-medium text-left py-4 pl-4">
                   {event.name}
                 </TableCell>
 
-                <TableCell className="text-center py-4">
+                <TableCell className="text-left py-4 pl-2">
                   {new Date(event.date).toLocaleDateString()}
                 </TableCell>
 
-                <TableCell className="text-center py-4">
+                <TableCell className="text-left py-4 pl-5">
                   {event.location}
                 </TableCell>
 
-                <TableCell className="text-center py-4">
+                <TableCell className="text-center py-4 pl-10">
                   {event.attendees.toLocaleString()}
                 </TableCell>
 
-                <TableCell className="text-center py-4">
+                <TableCell className="text-center py-4 pl-8">
                   ₹{event.revenue.toLocaleString()}
                 </TableCell>
 
                 <TableCell className="text-center">
                   <Badge
                     variant="secondary"
-                    className={getEngagementColor(event.engagement)}
+                    className={`bg-${getEngagementColor(event.engagement)} py-2 px-2`}
                   >
                     {event.engagement}%
                   </Badge>

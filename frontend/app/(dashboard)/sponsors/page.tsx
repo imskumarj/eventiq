@@ -28,6 +28,7 @@ import {
 import {
   getSponsors,
   createSponsor,
+  updateLeads,
 } from "@/services/sponsors";
 
 export default function Sponsors() {
@@ -40,12 +41,42 @@ export default function Sponsors() {
 
   const formRef = useRef<HTMLDivElement | null>(null);
 
+  const [leadModalOpen, setLeadModalOpen] = useState(false);
+  const [selectedSponsorId, setSelectedSponsorId] = useState<string | null>(null);
+
+  const [leadForm, setLeadForm] = useState({
+    leads: 0,
+    boothVisits: 0,
+  });
+
   const [form, setForm] = useState({
     name: "",
     email: "",
     eventId: "",
     amount: 0,
   });
+
+  function openLeadModal(id: string) {
+    setSelectedSponsorId(id);
+    setLeadForm({
+      leads: 0,
+      boothVisits: 0,
+    });
+    setLeadModalOpen(true);
+  }
+
+  async function handleLeadUpdate() {
+    if (!selectedSponsorId) return;
+
+    try {
+      await updateLeads(selectedSponsorId, leadForm);
+
+      setLeadModalOpen(false);
+      fetchSponsors(); // refresh table
+    } catch {
+      alert("Failed to update leads");
+    }
+  }
 
   /* ---------------- Fetch ---------------- */
 
@@ -106,7 +137,7 @@ export default function Sponsors() {
   }, [showForm]);
 
   return (
-    <div className="space-y-6 max-w-[1400px]">
+    <div className="relative space-y-6 max-w-[1400px]">
 
       {/* HEADER */}
       <motion.div className="flex justify-between">
@@ -149,6 +180,7 @@ export default function Sponsors() {
               <TableHead className="py-4 text-center">Leads</TableHead>
               <TableHead className="py-4 text-center">ROI</TableHead>
               <TableHead className="py-4 text-center">Status</TableHead>
+              <TableHead className="py-4 text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -168,6 +200,15 @@ export default function Sponsors() {
                   >
                     {s.roi > 100 ? "Active" : "Low"}
                   </Badge>
+                </TableCell>
+
+                <TableCell className="py-4 flex items-center justify-center gap-4">
+                  <Button 
+                    style={{ color: "blue" }}
+                    onClick={() => openLeadModal(s.id)}
+                  >
+                    Update Leads
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -255,6 +296,66 @@ export default function Sponsors() {
 
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {leadModalOpen && (
+          <motion.div
+            className="card-elevated p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+              {/* HEADER */}
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold">Update Leads</h2>
+
+                <button onClick={() => setLeadModalOpen(false)}>
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* FORM */}
+              <div className="space-y-4">
+
+                <div>
+                  <Label>Booth Visits</Label>
+                  <Input
+                    type="number"
+                    value={leadForm.boothVisits}
+                    onChange={(e) =>
+                      setLeadForm({
+                        ...leadForm,
+                        boothVisits: Number(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <Label>Leads Generated</Label>
+                  <Input
+                    type="number"
+                    value={leadForm.leads}
+                    onChange={(e) =>
+                      setLeadForm({
+                        ...leadForm,
+                        leads: Number(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+
+                <Button
+                  onClick={handleLeadUpdate}
+                  className="w-full gradient-accent text-accent-foreground"
+                >
+                  Save
+                </Button>
+
+              </div>
+            </motion.div>
         )}
       </AnimatePresence>
 

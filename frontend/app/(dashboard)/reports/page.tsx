@@ -30,27 +30,6 @@ const reportTypes = [
     icon: FileText,
     color: "bg-accent/10 text-accent",
   },
-  {
-    title: "Sponsor Performance",
-    type: "sponsor",
-    desc: "Detailed sponsor engagement and lead metrics",
-    icon: FileSpreadsheet,
-    color: "bg-info/10 text-info",
-  },
-  {
-    title: "Event Summary",
-    type: "event",
-    desc: "Complete event overview with attendee analytics",
-    icon: File,
-    color: "bg-success/10 text-success",
-  },
-  {
-    title: "Custom Report",
-    type: "custom",
-    desc: "Build a custom report with selected metrics",
-    icon: FileText,
-    color: "bg-warning/10 text-warning",
-  },
 ];
 
 export default function Reports() {

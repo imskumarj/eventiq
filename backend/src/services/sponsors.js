@@ -43,9 +43,11 @@ export async function getSponsors({ search, user }) {
 
   let data = sponsorships.map((s) => {
 
+    const revenue = s.leads * 1000;
+
     const roi =
       s.investment > 0
-        ? ((s.leads * 1000) / s.investment) * 100
+        ? ((revenue - s.investment) / s.investment) * 100
         : 0;
 
     return {
