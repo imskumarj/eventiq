@@ -19,7 +19,9 @@ export async function processCsv(filePath, filename, userId) {
     const errors = [];
 
     fs.createReadStream(filePath)
-      .pipe(csv())
+      .pipe(csv({
+        mapHeaders: ({ header }) => header.toLowerCase().trim()
+      }))
       .on("data", (data) => rows.push(data))
 
       .on("end", async () => {

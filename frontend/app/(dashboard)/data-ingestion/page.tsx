@@ -143,7 +143,7 @@ export default function DataIngestion() {
       </motion.div>
 
       {/* Upload Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
 
         {/* CSV Upload */}
         <motion.div
@@ -245,40 +245,6 @@ export default function DataIngestion() {
             )}
           </div>
         </motion.div>
-
-        {/* Options */}
-        <div className="space-y-6">
-          <motion.div className="card-elevated p-6">
-            <h3 className="text-sm font-semibold mb-3">
-              Manual Entry
-            </h3>
-
-            <p className="text-xs text-muted-foreground mb-3">
-              Enter data manually
-            </p>
-
-            <Button variant="outline" size="sm" className="w-full py-2">
-              Open Form
-            </Button>
-          </motion.div>
-
-          <motion.div className="card-elevated p-6">
-            <div className="flex items-center gap-2 mb-3">
-              <Key className="w-4 h-4 text-accent" />
-              <h3 className="text-sm font-semibold">
-                API Integration
-              </h3>
-            </div>
-
-            <p className="text-xs text-muted-foreground mb-3">
-              Connect external data sources
-            </p>
-
-            <Button variant="outline" size="sm" className="w-full py-2">
-              Configure API
-            </Button>
-          </motion.div>
-        </div>
       </div>
 
       {/* Recent Imports */}
