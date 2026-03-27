@@ -2,7 +2,7 @@ import prisma from "../config/db.js";
 
 /* ---------------- GET EVENTS ---------------- */
 
-export async function getEvents({ search, page = 1, limit = 10, user }) {
+export async function getEvents({ search, page = 1, limit = 1000, user }) {
 
   const skip = (page - 1) * limit;
 
