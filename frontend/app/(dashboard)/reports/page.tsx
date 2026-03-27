@@ -58,13 +58,14 @@ export default function Reports() {
   const [reports, setReports] = useState<any[]>([]);
   const [format, setFormat] = useState("PDF");
   const [loading, setLoading] = useState(false);
+  const API_DOC = process.env.NEXT_PUBLIC_DOCS_URL || "http://localhost:5000";
 
   /* ---------------- Fetch Reports ---------------- */
 
   async function fetchReports() {
     try {
       const res = await getReports();
-      setReports(res.data);
+      setReports(res.data.data || res.data);
     } catch {
       console.error("Failed to fetch reports");
     }
@@ -234,7 +235,7 @@ export default function Reports() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => window.open(r.fileUrl, "_blank")}
+                  onClick={() => window.open(`${API_DOC}/${r.fileUrl}`, "_blank")}
                 >
                   <Eye className="w-4 h-4" />
                 </Button>

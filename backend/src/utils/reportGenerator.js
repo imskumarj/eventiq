@@ -2,22 +2,12 @@ import fs from "fs";
 import path from "path";
 import { Parser } from "json2csv";
 import ExcelJS from "exceljs";
+import PDFDocument from "pdfkit";
 
 const REPORTS_DIR = "reports";
 
 if (!fs.existsSync(REPORTS_DIR)) {
   fs.mkdirSync(REPORTS_DIR);
-}
-
-/* -------- Sample Data Generator -------- */
-
-function generateData(type) {
-  // Later replace with DB queries
-
-  return [
-    { name: "Event A", revenue: 120000, attendees: 2000 },
-    { name: "Event B", revenue: 80000, attendees: 1500 },
-  ];
 }
 
 /* -------- CSV -------- */
@@ -32,14 +22,14 @@ export async function generateCSV(data, filename) {
   return filePath;
 }
 
-/* -------- Excel -------- */
+/* -------- EXCEL -------- */
 
 export async function generateExcel(data, filename) {
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet("Report");
 
-  sheet.columns = Object.keys(data[0]).map((key) => ({
-    header: key,
+  sheet.columns = Object.keys(data[0]).map(key => ({
+    header: key.toUpperCase(),
     key,
   }));
 
@@ -51,11 +41,37 @@ export async function generateExcel(data, filename) {
   return filePath;
 }
 
-/* -------- MAIN GENERATOR -------- */
+/* -------- PDF -------- */
 
-export async function generateReportFile(type, format) {
+export async function generatePDF(data, filename) {
+  const filePath = path.join(REPORTS_DIR, filename);
 
-  const data = generateData(type);
+  const doc = new PDFDocument();
+  doc.pipe(fs.createWriteStream(filePath));
+
+  doc.fontSize(18).text("Report", { align: "center" });
+  doc.moveDown();
+
+  data.forEach((row, i) => {
+    doc.fontSize(12).text(`Row ${i + 1}`);
+    Object.entries(row).forEach(([key, value]) => {
+      doc.text(`${key}: ${value}`);
+    });
+    doc.moveDown();
+  });
+
+  doc.end();
+
+  return filePath;
+}
+
+/* -------- MAIN -------- */
+
+export async function generateReportFile(type, format, data) {
+
+  if (!data || data.length === 0) {
+    throw new Error("No data available for report");
+  }
 
   const filename = `${type}-${Date.now()}.${format.toLowerCase()}`;
 
@@ -67,9 +83,9 @@ export async function generateReportFile(type, format) {
     return generateExcel(data, filename);
   }
 
-  // PDF placeholder
-  const filePath = path.join(REPORTS_DIR, filename);
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  if (format === "PDF") {
+    return generatePDF(data, filename);
+  }
 
-  return filePath;
+  throw new Error("Invalid format");
 }

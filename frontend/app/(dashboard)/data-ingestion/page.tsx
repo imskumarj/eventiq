@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   uploadCsv,
@@ -46,10 +47,18 @@ export default function DataIngestion() {
   const [imports, setImports] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const router = useRouter();
   const [preview, setPreview] = useState<string[][] | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const [error, setError] = useState("");
+
+  const reloadPage = () => {
+    setError("");
+    setSelectedFile(null);
+    setPreview(null);
+    window.location.reload();
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -107,8 +116,7 @@ export default function DataIngestion() {
       await uploadCsv(selectedFile);
       await fetchImports();
 
-      setSelectedFile(null);
-      setPreview(null);
+      reloadPage();
     } catch {
       setError("Upload failed");
     }
@@ -210,8 +218,7 @@ export default function DataIngestion() {
 
                   <button
                     onClick={() => {
-                      setPreview(null);
-                      setSelectedFile(null);
+                      reloadPage();
                     }}
                   >
                     <X className="w-4 h-4" />
