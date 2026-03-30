@@ -1,4 +1,4 @@
-# 🚀 EventIQ
+# 🚀 EventIQ 
 
 ## Intelligent Event Analytics Platform
 
